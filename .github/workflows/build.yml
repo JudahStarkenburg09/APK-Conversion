@@ -1,46 +1,57 @@
-name: CI
+name: Build
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 0 1,15 * *'
 
 jobs:
-  build:
+  build-android:
+    name: Build for Android
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      # used to cache dependencies with a timeout
-      - name: Get Date
-        id: get-date
+      # Set up Python and upgrade dependencies
+      - name: Set up Python and upgrade dependencies
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'  # Specify your Python version here
+
+      - name: Upgrade setuptools and cython
         run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
+          python -m pip install --upgrade pip
+          pip install --upgrade setuptools cython
 
-      - name: Cache Buildozer global directory
-        uses: actions/cache@v2
-        with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }} # Replace with your path
+      # Install Java (required for Buildozer)
+      - name: Install Java 8
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-8-jdk
 
-      - uses: actions/cache@v2
-        with:
-          path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
+      # Install Android SDK and NDK dependencies
+      - name: Install Android dependencies
+        run: |
+          sudo apt-get install -y unzip wget
+          # Download Android SDK command-line tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d $HOME/android
+          # Accept SDK licenses
+          yes | $HOME/android/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android --licenses
+          # Install platform tools, build tools, android SDK, and NDK
+          $HOME/android/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android "platform-tools" "build-tools;29.0.2" "android-29" "ndk-bundle"
 
+      # Build with Buildozer
       - name: Build with Buildozer
         uses: ArtemSBulgakov/buildozer-action@v1
         id: buildozer
         with:
-          command: buildozer android debug
-          buildozer_version: master
+          workdir: .
+          buildozer_version: stable
 
+      # Upload build artifacts (APK package)
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: package
           path: ${{ steps.buildozer.outputs.filename }}
