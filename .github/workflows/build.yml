@@ -1,7 +1,7 @@
 # Tested: 2024/08/05
 # by Kasper Arfman
 name: Build APK
-on: [push]
+on: workflow_dispatch
 jobs:
   build-android:
     name: Build for Android
