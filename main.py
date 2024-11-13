@@ -32,17 +32,17 @@ class MyApp(App):
         self.home_icon = Image(
             source='homeIco-s.png',
             size_hint=(0.1, 0.1),  # 10% of the window width and height
-            pos_hint={'center_x': 0.5, 'y': 0.02}  # Center horizontally, 2% from the bottom
+            pos_hint={'center_x': 0.5, 'y': 0.01}  # Center horizontally, 1% from the bottom
         )
         self.start_icon = Image(
             source='startIco-d.png',
             size_hint=(0.1, 0.1),
-            pos_hint={'center_x': 0.25, 'y': 0.02}  # Left of center
+            pos_hint={'center_x': 0.25, 'y': 0.01}  # Left of center
         )
         self.search_icon = Image(
-            source='homeIco-d.png',
+            source='searchIco-d.png',
             size_hint=(0.1, 0.1),
-            pos_hint={'center_x': 0.75, 'y': 0.02}  # Right of center
+            pos_hint={'center_x': 0.75, 'y': 0.01}  # Right of center
         )
 
         # Add images to the layout
@@ -82,7 +82,7 @@ class MyApp(App):
         # Update all icons to unselected (default state)
         self.home_icon.source = 'homeIco-d.png'
         self.start_icon.source = 'startIco-d.png'
-        self.search_icon.source = 'homeIco-d.png'
+        self.search_icon.source = 'searchIco-d.png'
 
         # Set the selected icon to the selected state
         selected_icon.source = selected_icon.source.replace('d.png', 's.png')
@@ -92,3 +92,6 @@ class MyApp(App):
 
 if __name__ == '__main__':
     MyApp().run()
+
+# Deselect: #585454
+# Select: #a8a4a4
