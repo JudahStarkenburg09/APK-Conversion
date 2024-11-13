@@ -1,10 +1,21 @@
-from kivy.app import App
+from kivy.config import Config
 from kivy.core.window import Window
+from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget
 from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image  # Import the Image widget
+
+# Lock orientation to portrait mode
+Config.set('graphics', 'orientation', 'portrait')
+
+# Set the window size to simulate a phone's portrait mode resolution
+Window.size = (1080, 1920)  # Example for a mobile phone screen in portrait mode
+
+# Scale the window down for your desktop monitor (e.g., scale by 0.5 to make it 540x960)
+scale_factor = 0.5
+Window.size = (int(1080 * scale_factor), int(1920 * scale_factor))
 
 class MyWidget(Widget):
     def __init__(self, **kwargs):
@@ -18,6 +29,7 @@ class MyWidget(Widget):
         self.bind(size=self.update_rect, pos=self.update_rect)
 
     def update_rect(self, *args):
+        # Adjust the rectangle size to always be the bottom 1/8 of the screen height
         self.rect.size = (Window.width, Window.height / 8)
         self.rect.pos = (0, 0)
 
@@ -35,7 +47,7 @@ class MyApp(App):
             pos_hint={'center_x': 0.5, 'y': 0.02}  # Center horizontally, 2% from the bottom
         )
         self.start_icon = Image(
-            source='homeIco-d.png',
+            source='startIco-d.png',
             size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.25, 'y': 0.02}  # Left of center
         )
@@ -81,7 +93,7 @@ class MyApp(App):
     def update_selected_icon(self, selected_icon, page_name):
         # Update all icons to unselected (default state)
         self.home_icon.source = 'homeIco-d.png'
-        self.start_icon.source = 'homeIco-d.png'
+        self.start_icon.source = 'startIco-d.png'
         self.search_icon.source = 'homeIco-d.png'
 
         # Set the selected icon to the selected state
