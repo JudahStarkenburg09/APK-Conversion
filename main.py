@@ -6,10 +6,9 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image  # Import the Image widget
 
-WIDTH = 367
-HEIGHT = 600
 
-Window.size = (WIDTH, HEIGHT)
+WIDTH = Window.width
+HEIGHT = Window.height
 
 # Define WIDTH and HEIGHT dynamically based on the window size
 
@@ -56,9 +55,9 @@ class MyApp(App):
         layout.add_widget(MyWidget())
 
         # Create an image for the home icon and other icons
-        self.home_icon = Image(source='homeIco-s.png', size_hint=(None, None), size=(50, 50), pos=(x1_2 - x1_16, y1_16 / 3))
-        self.start_icon = Image(source='homeIco-d.png', size_hint=(None, None), size=(50, 50), pos=(x1_2-x1_4-30, y1_16 / 3))
-        self.search_icon = Image(source='homeIco-d.png', size_hint=(None, None), size=(50, 50), pos=(x1_2+x1_4-10, y1_16 / 3))
+        self.home_icon = Image(source='homeIco-s.png', size_hint=(None, None), size=(50, 50), pos=(x1_2, y1_16 / 3))
+        self.start_icon = Image(source='homeIco-d.png', size_hint=(None, None), size=(50, 50), pos=(x1_2-x1_4, y1_16 / 3))
+        self.search_icon = Image(source='homeIco-d.png', size_hint=(None, None), size=(50, 50), pos=(x1_2+x1_4, y1_16 / 3))
 
         # Add images to the layout
         layout.add_widget(self.home_icon)
