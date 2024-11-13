@@ -5,7 +5,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget
 from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image  # Import the Image widget
-
+# Run Code
 
 WIDTH = Window.width
 HEIGHT = Window.height
