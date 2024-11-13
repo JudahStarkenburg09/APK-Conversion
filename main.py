@@ -2,81 +2,90 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.screenmanager import ScreenManager, Screen
 
-# Define WIDTH and HEIGHT dynamically based on the window size
-WIDTH = Window.width
-HEIGHT = Window.height
+# Set window size
+WIDTH = 367
+HEIGHT = 600
+Window.size = (WIDTH, HEIGHT)
 
-# Position values based on the screen width
-x1_16 = Window.width / 16
-x1_12 = Window.width / 12
-x1_10 = Window.width / 10
-x1_8 = Window.width / 8
-x1_6 = Window.width / 6
-x1_4 = Window.width / 4
-x1_2 = Window.width / 2  # 50% of the width
-
-y1_16 = Window.height / 16
-y1_12 = Window.height / 12
-y1_10 = Window.height / 10
-y1_8 = Window.height / 8
-y1_6 = Window.height / 6
-y1_4 = Window.height / 4
-y1_2 = Window.height / 2  # 50% of the height
-
-# Define text sizes based on window height
-smlText1 = Window.height / 40
-smlText2 = Window.height / 35
-medText1 = Window.height / 30
-medText2 = Window.height / 25
-lrgText = Window.height / 20
-exLrgText = Window.height / 15
-
-class MyApp(App):
-    def build(self):
+# Define screen classes for each page
+class Page1(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         layout = FloatLayout()
 
-        # Create labels with different text sizes and set x to x1_2
-        label1 = Label(
-            text="Small Text 1", size_hint=(None, None),
-            font_size=smlText1,
-            pos=(x1_2, HEIGHT * 0.8)
+        # Add label to page 1
+        label = Label(
+            text="Page 1", size_hint=(None, None),
+            font_size=HEIGHT / 20,
+            pos=(WIDTH / 2 - 50, HEIGHT / 2 - 20)
         )
-        label2 = Label(
-            text="Small Text 2", size_hint=(None, None),
-            font_size=smlText2,
-            pos=(x1_2, HEIGHT * 0.7)
-        )
-        label3 = Label(
-            text="Medium Text 1", size_hint=(None, None),
-            font_size=medText1,
-            pos=(x1_2, HEIGHT * 0.6)
-        )
-        label4 = Label(
-            text="Medium Text 2", size_hint=(None, None),
-            font_size=medText2,
-            pos=(x1_2, HEIGHT * 0.5)
-        )
-        label5 = Label(
-            text="Large Text", size_hint=(None, None),
-            font_size=lrgText,
-            pos=(x1_2, HEIGHT * 0.4)
-        )
-        label6 = Label(
-            text="Extra Large Text", size_hint=(None, None),
-            font_size=exLrgText,
-            pos=(x1_2, HEIGHT * 0.3),
-        )
+        layout.add_widget(label)
+        self.add_widget(layout)
 
-        # Add labels to the layout
-        layout.add_widget(label1)
-        layout.add_widget(label2)
-        layout.add_widget(label3)
-        layout.add_widget(label4)
-        layout.add_widget(label5)
-        layout.add_widget(label6)
+class Page2(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
 
-        return layout
+        # Add label to page 2
+        label = Label(
+            text="Page 2", size_hint=(None, None),
+            font_size=HEIGHT / 20,
+            pos=(WIDTH / 2 - 50, HEIGHT / 2 - 20)
+        )
+        layout.add_widget(label)
+        self.add_widget(layout)
+
+class Page3(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+
+        # Add label to page 3
+        label = Label(
+            text="Page 3", size_hint=(None, None),
+            font_size=HEIGHT / 20,
+            pos=(WIDTH / 2 - 50, HEIGHT / 2 - 20)
+        )
+        layout.add_widget(label)
+        self.add_widget(layout)
+
+# Define the main app class
+class MyApp(App):
+    def build(self):
+        # Main layout that holds sidebar and screen manager
+        main_layout = BoxLayout(orientation='horizontal')
+
+        # Sidebar layout
+        sidebar = BoxLayout(orientation='vertical', size_hint=(None, 1), width=80)
+        sidebar.add_widget(Button(text="Page 1", on_press=self.change_page))
+        sidebar.add_widget(Button(text="Page 2", on_press=self.change_page))
+        sidebar.add_widget(Button(text="Page 3", on_press=self.change_page))
+
+        # Screen manager to hold pages
+        self.screen_manager = ScreenManager()
+        self.screen_manager.add_widget(Page1(name="page1"))
+        self.screen_manager.add_widget(Page2(name="page2"))
+        self.screen_manager.add_widget(Page3(name="page3"))
+
+        # Add sidebar and screen manager to the main layout
+        main_layout.add_widget(sidebar)
+        main_layout.add_widget(self.screen_manager)
+
+        return main_layout
+
+    # Change screen page function
+    def change_page(self, instance):
+        if instance.text == "Page 1":
+            self.screen_manager.current = "page1"
+        elif instance.text == "Page 2":
+            self.screen_manager.current = "page2"
+        elif instance.text == "Page 3":
+            self.screen_manager.current = "page3"
 
 if __name__ == '__main__':
     MyApp().run()
