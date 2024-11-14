@@ -4,13 +4,32 @@ from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget
 from kivy.uix.textinput import TextInput
-from kivy.graphics import Rectangle, Color, RoundedRectangle
+from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image
-from kivy.uix.button import Button
+from kivy.uix.button import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
+# from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
+from kivy.metrics import sp
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+
+class ErrorPopup(Popup):
+    def __init__(self, error_message, **kwargs):
+        super().__init__(**kwargs)
+        self.title = "Error"
+        self.size_hint = (0.5, 0.5)
+        self.content = Label(text=error_message)
+        self.add_widget(self.content)
+        close_button = Button(text="OK", size_hint=(1, 0.2))
+        close_button.bind(on_press=self.dismiss)
+        self.add_widget(close_button)
+
+
+class ClickableLabel(ButtonBehavior, Label):
+    pass
 
 
 class MyWidget(Widget):
@@ -25,6 +44,11 @@ class MyWidget(Widget):
     def update_rect(self, *args):
         self.rect.size = (Window.width, Window.height / 9)
         self.rect.pos = (0, 0)
+
+    def handle_error(self, error_message):
+        # Create an error popup to display the error message
+        error_popup = ErrorPopup(error_message)
+        error_popup.open()
     
 
 class MyApp(App):
@@ -80,6 +104,82 @@ class MyApp(App):
             self.layout.add_widget(self.page_label)
             self.current_page_content.append(self.page_label)
 
+    def methods_overlay(self):
+        self.methodsTitle = Label(
+            text="Methods",
+            font_size=sp(30),
+            size_hint=(0.8, 0.8),
+            pos_hint={'center_x': 0.15, 'center_y': 0.88},
+            font_name='impact.ttf'  # Ensure the font file is in the same directory as your script
+        )
+
+        self.layout.add_widget(self.methodsTitle)
+        self.current_page_content.append(self.methodsTitle)
+
+        # Create and add the button
+        # Create and add the clickable text labels
+        read = ClickableLabel(
+            text="Read",
+            size_hint=(0.2, 0.075),
+            pos_hint={'center_x': 0.15, 'center_y': 0.75},
+            font_name='impact.ttf',
+            font_size=sp(20),
+            color=(1, 1, 1, 0.8)
+        )
+
+        speech = ClickableLabel(
+            text="Speech",
+            size_hint=(0.2, 0.075),
+            pos_hint={'center_x': 0.15, 'center_y': 0.65},
+            font_name='impact.ttf',
+            font_size=sp(20),
+            color=(1, 1, 1, 0.8)
+        )
+
+        fill_blanks = ClickableLabel(
+            text="Fill Blanks",
+            size_hint=(0.2, 0.075),
+            pos_hint={'center_x': 0.15, 'center_y': 0.55},
+            font_name='impact.ttf',
+            font_size=sp(20),
+            color=(1, 1, 1, 0.8)
+        )
+
+        audio = ClickableLabel(
+            text="Audio",
+            size_hint=(0.2, 0.075),
+            pos_hint={'center_x': 0.15, 'center_y': 0.45},
+            font_name='impact.ttf',
+            font_size=sp(20),
+            color=(1, 1, 1, 0.8)
+        )
+
+
+
+        # Bind the button to the empty function
+        read.bind(on_press=self.empty_function)
+        speech.bind(on_press=self.empty_function)
+        fill_blanks.bind(on_press=self.empty_function)
+        audio.bind(on_press=self.empty_function)
+
+        self.layout.add_widget(read)
+        self.layout.add_widget(speech)
+        self.layout.add_widget(fill_blanks)
+        self.layout.add_widget(audio)
+
+        self.current_page_content.append(read)
+        self.current_page_content.append(speech)
+        self.current_page_content.append(fill_blanks)
+        self.current_page_content.append(audio)
+
+        # Create a rectangle from the top left, width 40% of the screen, height covers entire screen (minus the bottom bar)
+        with self.layout.canvas.before:
+            Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
+            self.rect = Rectangle(
+                pos=(0, (Window.height / 9) + (Window.height / 100)),  # bottom-left corner
+                size=(Window.width * 0.3, Window.height)  # 40% of width, full height
+            )
+
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
         window_height = Window.height
@@ -87,117 +187,37 @@ class MyApp(App):
             self.clear_page_content()
             self.update_selected_icon(self.start_icon, "Start")
 
-            self.methodsTitle = Label(
-                text="Methods",
-                font_size=f'{window_width/16}dp',
-                size_hint=(0.8, 0.8),
-                pos_hint={'center_x': 0.15, 'center_y': 0.88},
-                font_name='impact.ttf'  # Ensure the font file is in the same directory as your script
-            )
-
-            self.layout.add_widget(self.methodsTitle)
-            self.current_page_content.append(self.methodsTitle)
-
-            # Create and add the button
-            read = Button(
-                text="Read",
-                size_hint=(0.2, 0.075),
-                pos_hint={'center_x': 0.15, 'center_y': 0.75},
-                background_normal='button1-d.png',  # Set image as background
-                background_down='button1-s.png',    # Optional: Set image for the button when pressed
-                font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}dp',
-                border=(0, 0, 0, 0),
-                color=(1, 1, 1, 0.8)
-            )
-
-            # Create and add the button
-            speech = Button(
-                text="Speech",
-                size_hint=(0.2, 0.075),
-                pos_hint={'center_x': 0.15, 'center_y': 0.65},
-                background_normal='button1-d.png',  # Set image as background
-                background_down='button1-s.png',    # Optional: Set image for the button when pressed
-                font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}dp',
-                border=(0, 0, 0, 0),
-                color=(1, 1, 1, 0.8)
-            )
-
-            # Create and add the button
-            fill_blanks = Button(
-                text="Fill Blanks",
-                size_hint=(0.2, 0.075),
-                pos_hint={'center_x': 0.15, 'center_y': 0.55},
-                background_normal='button1-d.png',  # Set image as background
-                background_down='button1-s.png',    # Optional: Set image for the button when pressed
-                font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}dp',
-                border=(0, 0, 0, 0),
-                color=(1, 1, 1, 0.8)
-            )
-
-            audio = Button(
-                text="Audio",
-                size_hint=(0.2, 0.075),
-                pos_hint={'center_x': 0.15, 'center_y': 0.45},
-                background_normal='button1-d.png',  # Set image as background
-                background_down='button1-s.png',    # Optional: Set image for the button when pressed
-                font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}dp',
-                border=(0, 0, 0, 0),
-                color=(1, 1, 1, 0.8)
-            )
-
-
-            # Bind the button to the empty function
-            read.bind(on_press=self.empty_function)
-            speech.bind(on_press=self.empty_function)
-            fill_blanks.bind(on_press=self.empty_function)
-            audio.bind(on_press=self.empty_function)
-
-            self.layout.add_widget(read)
-            self.layout.add_widget(speech)
-            self.layout.add_widget(fill_blanks)
-            self.layout.add_widget(audio)
-
-            self.current_page_content.append(read)
-            self.current_page_content.append(speech)
-            self.current_page_content.append(fill_blanks)
-            self.current_page_content.append(audio)
-
-            # Create a rectangle from the top left, width 40% of the screen, height covers entire screen (minus the bottom bar)
-            with self.layout.canvas.before:
-                Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
-                self.rect = Rectangle(
-                    pos=(0, (Window.height / 9) + (Window.height / 100)),  # bottom-left corner
-                    size=(Window.width * 0.3, Window.height)  # 40% of width, full height
-                )
-
             # Get the width and height of the window
             print(f"{window_width} + {window_height}")
 
-            # Calculate the position and size based on the requested percentages
-            scrollview_width = window_width * 0.65
-            scrollview_height = (window_height - (window_height / 9) - (window_height / 100)) - (window_height/50)
-            
 
+            # Variables to represent percentage distances from the window's edges
+            from_left = 0.02
+            from_right = 0.02
+            from_top = 0.02
+            from_bottom = 0.3
 
-            scrollview_pos_x = window_width * 0.31  # from the left side
-            scrollview_pos_y = window_height * 0.98  # from the top (remaining height)
+            # Calculate the width and height based on the distances from the edges
+            scrollview_width = window_width * (1 - from_left - from_right)
+            scrollview_height = window_height * (1 - from_top - from_bottom)
+
+            # Calculate the position (x and y)
+            scrollview_pos_x = window_width * from_left
+            scrollview_pos_y = window_height * (1 - from_top)  # Position from the top edge
 
             # Create the ScrollView
             scroll_view = ScrollView(
                 size_hint=(None, None),
                 size=(scrollview_width, scrollview_height),
-                pos_hint={'x': scrollview_pos_x / window_width, 'top': scrollview_pos_y/window_height}  # Adjust positions
+                pos_hint={'x': scrollview_pos_x / window_width, 'top': scrollview_pos_y / window_height}
             )
+
 
 
             # Create the Label for the verse
             verse_label = Label(
                 text=self.scripture,  # Add the scripture text here
-                font_size=f'{window_width/44}dp',
+                font_size=f'{window_width/44}sp',
                 size_hint_y=None,  # Make the label grow vertically
                 text_size=(scrollview_width, None),  # Text wraps at the width of the scroll view
                 halign='left',
