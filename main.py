@@ -89,7 +89,7 @@ class MyApp(App):
 
             self.methodsTitle = Label(
                 text="Methods",
-                font_size=f'{window_width/16}sp',
+                font_size=f'{window_width/16}dp',
                 size_hint=(0.8, 0.8),
                 pos_hint={'center_x': 0.15, 'center_y': 0.88},
                 font_name='impact.ttf'  # Ensure the font file is in the same directory as your script
@@ -106,7 +106,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}sp',
+                font_size=f'{window_width/40}dp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -119,7 +119,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}sp',
+                font_size=f'{window_width/40}dp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -132,7 +132,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}sp',
+                font_size=f'{window_width/40}dp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -144,7 +144,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size=f'{window_width/40}sp',
+                font_size=f'{window_width/40}dp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -197,7 +197,7 @@ class MyApp(App):
             # Create the Label for the verse
             verse_label = Label(
                 text=self.scripture,  # Add the scripture text here
-                font_size=f'{window_width/44}sp',
+                font_size=f'{window_width/44}dp',
                 size_hint_y=None,  # Make the label grow vertically
                 text_size=(scrollview_width, None),  # Text wraps at the width of the scroll view
                 halign='left',
