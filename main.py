@@ -81,13 +81,15 @@ class MyApp(App):
             self.current_page_content.append(self.page_label)
 
     def select_start(self, instance, touch, _pass):
+        window_width = Window.width
+        window_height = Window.height
         if instance.collide_point(touch.x, touch.y) or _pass:
             self.clear_page_content()
             self.update_selected_icon(self.start_icon, "Start")
 
             self.methodsTitle = Label(
                 text="Methods",
-                font_size='50sp',
+                font_size=f'{window_width/16}sp',
                 size_hint=(0.8, 0.8),
                 pos_hint={'center_x': 0.15, 'center_y': 0.88},
                 font_name='impact.ttf'  # Ensure the font file is in the same directory as your script
@@ -104,7 +106,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size='20sp',
+                font_size=f'{window_width/40}sp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -117,7 +119,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size='20sp',
+                font_size=f'{window_width/40}sp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -130,7 +132,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size='20sp',
+                font_size=f'{window_width/40}sp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -142,7 +144,7 @@ class MyApp(App):
                 background_normal='button1-d.png',  # Set image as background
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
-                font_size='20sp',
+                font_size=f'{window_width/40}sp',
                 border=(0, 0, 0, 0),
                 color=(1, 1, 1, 0.8)
             )
@@ -173,8 +175,7 @@ class MyApp(App):
                 )
 
             # Get the width and height of the window
-            window_width = Window.width
-            window_height = Window.height
+            print(f"{window_width} + {window_height}")
 
             # Calculate the position and size based on the requested percentages
             scrollview_width = window_width * 0.65
@@ -196,7 +197,7 @@ class MyApp(App):
             # Create the Label for the verse
             verse_label = Label(
                 text=self.scripture,  # Add the scripture text here
-                font_size='18sp',
+                font_size=f'{window_width/44}sp',
                 size_hint_y=None,  # Make the label grow vertically
                 text_size=(scrollview_width, None),  # Text wraps at the width of the scroll view
                 halign='left',
@@ -220,24 +221,28 @@ class MyApp(App):
 
 
     def select_search(self, instance, touch, _pass):
+        window_width = Window.width
+        window_height = Window.height
         if instance.collide_point(touch.x, touch.y) or _pass:
             self.clear_page_content()
             self.update_selected_icon(self.search_icon, "Search")
             self.search_input = TextInput(
                 hint_text="Type a Bible verse",
                 size_hint=(1, None),
-                height=40,
-                pos_hint={'x': 0, 'top': 1},
+                height=window_width/16,
+                pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
                 background_color=(0.66, 0.64, 0.64, 1),  # RGB for #a8a4a4
                 foreground_color=(0, 0, 0, 1),
                 padding=(10, 10),
                 cursor_color=(0, 0, 0, 1),
-                cursor_width=1
+                cursor_width=1,
+                font_size=window_width/32  # Change this value to set the font size
             )
             self.search_input.bind(on_text_validate=self.on_enter_search)
             self.layout.add_widget(self.search_input)
             self.current_page_content.append(self.search_input)
+
 
     def update_selected_icon(self, selected_icon, page_name):
         # Reset all icons to default state
