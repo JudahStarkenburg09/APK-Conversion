@@ -7,6 +7,11 @@ from kivy.uix.textinput import TextInput
 from kivy.graphics import Rectangle, Color, RoundedRectangle
 from kivy.uix.image import Image
 from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.clock import Clock
+
 
 class MyWidget(Widget):
     def __init__(self, **kwargs):
@@ -15,12 +20,18 @@ class MyWidget(Widget):
             Color(0.1, 0.1, 0.1, 1)  # Dark gray background color
             self.rect = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self.update_rect, pos=self.update_rect)
+        
 
     def update_rect(self, *args):
         self.rect.size = (Window.width, Window.height / 9)
         self.rect.pos = (0, 0)
+    
 
 class MyApp(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.scripture="Search to choose your piece of scripture"
+
     def build(self):
         self.layout = FloatLayout()
         self.current_page_content = []
@@ -94,8 +105,8 @@ class MyApp(App):
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
                 font_size='20sp',
-                border=(0,0,0,0),
-                color=(1, 1, 1, 0.8) 
+                border=(0, 0, 0, 0),
+                color=(1, 1, 1, 0.8)
             )
 
             # Create and add the button
@@ -107,8 +118,8 @@ class MyApp(App):
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
                 font_size='20sp',
-                border=(0,0,0,0),
-                color=(1, 1, 1, 0.8) 
+                border=(0, 0, 0, 0),
+                color=(1, 1, 1, 0.8)
             )
 
             # Create and add the button
@@ -120,8 +131,8 @@ class MyApp(App):
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
                 font_size='20sp',
-                border=(0,0,0,0),
-                color=(1, 1, 1, 0.8) 
+                border=(0, 0, 0, 0),
+                color=(1, 1, 1, 0.8)
             )
 
             audio = Button(
@@ -132,8 +143,8 @@ class MyApp(App):
                 background_down='button1-s.png',    # Optional: Set image for the button when pressed
                 font_name='impact.ttf',  # Ensure the font file is in the same directory as your script
                 font_size='20sp',
-                border=(0,0,0,0),
-                color=(1, 1, 1, 0.8) 
+                border=(0, 0, 0, 0),
+                color=(1, 1, 1, 0.8)
             )
 
 
@@ -153,14 +164,59 @@ class MyApp(App):
             self.current_page_content.append(fill_blanks)
             self.current_page_content.append(audio)
 
-
             # Create a rectangle from the top left, width 40% of the screen, height covers entire screen (minus the bottom bar)
             with self.layout.canvas.before:
                 Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
                 self.rect = Rectangle(
-                    pos=(0, (Window.height/9)+(Window.height/100)),  # bottom-left corner
+                    pos=(0, (Window.height / 9) + (Window.height / 100)),  # bottom-left corner
                     size=(Window.width * 0.3, Window.height)  # 40% of width, full height
                 )
+
+            # Get the width and height of the window
+            window_width = Window.width
+            window_height = Window.height
+
+            # Calculate the position and size based on the requested percentages
+            scrollview_width = window_width * 0.65
+            scrollview_height = (window_height - (window_height / 9) - (window_height / 100)) - (window_height/50)
+            
+
+
+            scrollview_pos_x = window_width * 0.31  # from the left side
+            scrollview_pos_y = window_height * 0.98  # from the top (remaining height)
+
+            # Create the ScrollView
+            scroll_view = ScrollView(
+                size_hint=(None, None),
+                size=(scrollview_width, scrollview_height),
+                pos_hint={'x': scrollview_pos_x / window_width, 'top': scrollview_pos_y/window_height}  # Adjust positions
+            )
+
+
+            # Create the Label for the verse
+            verse_label = Label(
+                text=self.scripture,  # Add the scripture text here
+                font_size='18sp',
+                size_hint_y=None,  # Make the label grow vertically
+                text_size=(scrollview_width, None),  # Text wraps at the width of the scroll view
+                halign='left',
+                valign='top',
+                color=(1, 1, 1, 1)  # Adjust text color if necessary
+            )
+
+            # Schedule the height adjustment to happen after the label is rendered
+            def update_height(*args):
+                verse_label.height = verse_label.texture_size[1]
+                print(f"Updated verse label height: {verse_label.height}")
+
+            # Run the update_height function once the current frame is finished
+            Clock.schedule_once(update_height, 0)
+
+
+            # Add the label to the scrollview
+            scroll_view.add_widget(verse_label)
+            self.layout.add_widget(scroll_view)
+            self.current_page_content.append(scroll_view)
 
 
     def select_search(self, instance, touch, _pass):
