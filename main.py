@@ -12,20 +12,27 @@ from kivy.uix.label import Label
 # from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 from kivy.metrics import sp
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
-from kivy.uix.label import Label
 
-class ErrorPopup(Popup):
-    def __init__(self, error_message, **kwargs):
-        super().__init__(**kwargs)
-        self.title = "Error"
-        self.size_hint = (0.5, 0.5)
-        self.content = Label(text=error_message)
-        self.add_widget(self.content)
-        close_button = Button(text="OK", size_hint=(1, 0.2))
-        close_button.bind(on_press=self.dismiss)
-        self.add_widget(close_button)
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+
+def show_error_popup(self, error_message):
+    # Create a simple popup to display the error message
+    content = Button(text="OK", size_hint=(None, None), size=(200, 100))
+    popup = Popup(
+        title="Error",
+        content=content,
+        size_hint=(None, None),
+        size=(400, 200),
+        auto_dismiss=False
+    )
+    content.bind(on_press=popup.dismiss)  # Close popup when "OK" is pressed
+
+    # Show the error message inside the popup
+    error_label = Label(text=f"An error occurred:\n{error_message}", font_size='18sp')
+    popup.content = error_label  # Replace content with the error label
+    popup.open()
 
 
 class ClickableLabel(ButtonBehavior, Label):
@@ -44,11 +51,6 @@ class MyWidget(Widget):
     def update_rect(self, *args):
         self.rect.size = (Window.width, Window.height / 9)
         self.rect.pos = (0, 0)
-
-    def handle_error(self, error_message):
-        # Create an error popup to display the error message
-        error_popup = ErrorPopup(error_message)
-        error_popup.open()
     
 
 class MyApp(App):
@@ -274,23 +276,21 @@ class MyApp(App):
         selected_icon.source = selected_icon.source.replace('d.png', 's.png')
 
     def on_enter_search(self, instance):
-        verseL = instance.text  # Get the input verse reference
+        try:
+            verseL = instance.text  # Get the input verse reference
+            self.scripture = self.search_verse(verseL)
+            # Proceed as normal with the search result
+            self.select_start(self.start_icon, instance, True)
 
-        # Placeholder for actual Bible lookup logic
-        self.scripture = self.search_verse(verseL)
-        # print(self.scripture)
+        except Exception as e:
+            # Catch any other unexpected errors
+            self.show_error_popup(f"An unexpected error occurred: {str(e)}")
 
-        # Create a dummy touch object (simulated)
-        dummy_touch = Widget()  # We just need an empty widget to pass as touch
-        dummy_touch.x = 0  # Dummy position, as Kivy won't use this for this case
-        dummy_touch.y = 0  # Dummy position
-
-        # Call select_start with the dummy touch and instance, but ensure the icon is correctly selected
-        self.select_start(self.start_icon, dummy_touch, True)
 
     def empty_function(self, instance):
         # Empty function for the button
         print("Empty Function")
+
 
     def search_verse(self, reference):
         import requests
@@ -305,11 +305,14 @@ class MyApp(App):
             self.reference = reference
             # Get verse text and reference
             verse_text = data.get("text", "Verse not found.")
-            # print(f"{reference}: {verse_text}")
             return verse_text
-        
+
         except requests.exceptions.RequestException as e:
             print(f"Error fetching the verse: {e}")
+            # Show error message in popup
+            self.show_error_popup(f"Error fetching verse: {str(e)}")
+            return "Error fetching verse."
+
 
 
 if __name__ == '__main__':
