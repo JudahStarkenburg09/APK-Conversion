@@ -9,13 +9,16 @@ from kivy.uix.image import Image
 from kivy.uix.button import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-# from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 from kivy.metrics import sp
-
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.properties import NumericProperty
 
 def show_error_popup(self, error_message):
     # Create a simple popup to display the error message
@@ -35,9 +38,19 @@ def show_error_popup(self, error_message):
     popup.open()
 
 
+# Create a clickable label by combining ButtonBehavior with Label
 class ClickableLabel(ButtonBehavior, Label):
-    pass
+    # Add a property for font size
+    font_size_ratio = NumericProperty(0.15)  # Adjust this ratio as needed
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Bind the font_size to the widget's height
+        self.bind(size=self.update_font_size)
+
+    def update_font_size(self, *args):
+        # Adjust font size relative to the widget's height
+        self.font_size = self.height * self.font_size_ratio
 
 class MyWidget(Widget):
     def __init__(self, **kwargs):
@@ -196,8 +209,8 @@ class MyApp(App):
             # Variables to represent percentage distances from the window's edges
             from_left = 0.02
             from_right = 0.02
-            from_top = 0.02
-            from_bottom = 0.3
+            from_top = 0.15
+            from_bottom = 0.12
 
             # Calculate the width and height based on the distances from the edges
             scrollview_width = window_width * (1 - from_left - from_right)
@@ -226,20 +239,37 @@ class MyApp(App):
                 valign='top',
                 color=(1, 1, 1, 1)  # Adjust text color if necessary
             )
+            overlayButtonbg = Image(source='button1-d.png',
+                    size_hint=(0.2, 0.2),  # Width and height as a percentage of the parent
+                    pos_hint={'center_x': 0.5, 'center_y': 0.925})  # Position relative to parent center
+
 
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
                 verse_label.height = verse_label.texture_size[1]
                 print(f"Updated verse label height: {verse_label.height}")
 
+
+            clickable_text = ClickableLabel(text="Click Me",
+                                size_hint=(0.2, 0.2),
+                                pos_hint={'center_x': 0.5, 'center_y': 0.925})
+
+
             # Run the update_height function once the current frame is finished
             Clock.schedule_once(update_height, 0)
 
-
             # Add the label to the scrollview
             scroll_view.add_widget(verse_label)
+
+            clickable_text.bind(on_press=self.empty_function)
+            overlayButtonbg.bind(on_touch_down=self.empty_function)
+
+            self.layout.add_widget(overlayButtonbg)
             self.layout.add_widget(scroll_view)
+            self.layout.add_widget(clickable_text)
             self.current_page_content.append(scroll_view)
+            self.current_page_content.append(overlayButtonbg)
+
 
 
     def select_search(self, instance, touch, _pass):
@@ -265,7 +295,6 @@ class MyApp(App):
             self.layout.add_widget(self.search_input)
             self.current_page_content.append(self.search_input)
 
-
     def update_selected_icon(self, selected_icon, page_name):
         # Reset all icons to default state
         self.home_icon.source = 'homeIco-d.png'
@@ -286,11 +315,9 @@ class MyApp(App):
             # Catch any other unexpected errors
             self.show_error_popup(f"An unexpected error occurred: {str(e)}")
 
-
     def empty_function(self, instance):
         # Empty function for the button
         print("Empty Function")
-
 
     def search_verse(self, reference):
         import requests
