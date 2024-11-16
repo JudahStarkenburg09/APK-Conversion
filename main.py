@@ -64,7 +64,6 @@ class MyWidget(Widget):
     def update_rect(self, *args):
         self.rect.size = (Window.width, Window.height / 9)
         self.rect.pos = (0, 0)
-    
 
 class MyApp(App):
     def __init__(self, **kwargs):
@@ -120,12 +119,11 @@ class MyApp(App):
             self.current_page_content.append(self.page_label)
 
     def methods_overlay(self):
-        self.methodsTitle = Label(
-            text="Methods",
-            font_size=sp(30),
-            size_hint=(0.8, 0.8),
-            pos_hint={'center_x': 0.15, 'center_y': 0.88},
-            font_name='impact.ttf'  # Ensure the font file is in the same directory as your script
+        self.methodsTitle = ClickableLabel(
+            text="Choose your method",
+            size_hint=(0.4, 0.4),
+            pos_hint={'center_x': 0.5, 'center_y': 0.88},
+            font_name='impact.ttf',
         )
 
         self.layout.add_widget(self.methodsTitle)
@@ -135,37 +133,41 @@ class MyApp(App):
         # Create and add the clickable text labels
         read = ClickableLabel(
             text="Read",
-            size_hint=(0.2, 0.075),
-            pos_hint={'center_x': 0.15, 'center_y': 0.75},
+            size_hint=(0.2, 0.2),
+            pos_hint={'center_x': 0.5, 'center_y': 0.75},
             font_name='impact.ttf',
-            font_size=sp(20),
             color=(1, 1, 1, 0.8)
         )
 
         speech = ClickableLabel(
             text="Speech",
-            size_hint=(0.2, 0.075),
-            pos_hint={'center_x': 0.15, 'center_y': 0.65},
+            size_hint=(0.2, 0.2),
+            pos_hint={'center_x': 0.5, 'center_y': 0.65},
             font_name='impact.ttf',
-            font_size=sp(20),
             color=(1, 1, 1, 0.8)
         )
 
         fill_blanks = ClickableLabel(
             text="Fill Blanks",
-            size_hint=(0.2, 0.075),
-            pos_hint={'center_x': 0.15, 'center_y': 0.55},
+            size_hint=(0.2, 0.2),
+            pos_hint={'center_x': 0.5, 'center_y': 0.55},
             font_name='impact.ttf',
-            font_size=sp(20),
             color=(1, 1, 1, 0.8)
         )
 
         audio = ClickableLabel(
             text="Audio",
-            size_hint=(0.2, 0.075),
-            pos_hint={'center_x': 0.15, 'center_y': 0.45},
+            size_hint=(0.2, 0.2),
+            pos_hint={'center_x': 0.5, 'center_y': 0.45},
             font_name='impact.ttf',
-            font_size=sp(20),
+            color=(1, 1, 1, 0.8)
+        )
+
+        back = ClickableLabel(
+            text="Back",
+            size_hint=(0.2, 0.2),
+            pos_hint={'center_x': 0.5, 'center_y': 0.35},
+            font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
@@ -176,24 +178,41 @@ class MyApp(App):
         speech.bind(on_press=self.empty_function)
         fill_blanks.bind(on_press=self.empty_function)
         audio.bind(on_press=self.empty_function)
+        back.bind(on_touch_down=self.overlay_button_back_pressed)
+
 
         self.layout.add_widget(read)
         self.layout.add_widget(speech)
         self.layout.add_widget(fill_blanks)
         self.layout.add_widget(audio)
+        self.layout.add_widget(back)
 
         self.current_page_content.append(read)
         self.current_page_content.append(speech)
         self.current_page_content.append(fill_blanks)
         self.current_page_content.append(audio)
+        self.current_page_content.append(back)
 
-        # Create a rectangle from the top left, width 40% of the screen, height covers entire screen (minus the bottom bar)
         with self.layout.canvas.before:
             Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
             self.rect = Rectangle(
-                pos=(0, (Window.height / 9) + (Window.height / 100)),  # bottom-left corner
-                size=(Window.width * 0.3, Window.height)  # 40% of width, full height
+                pos=(0, 0),  # bottom-left corner
+                size=(Window.width, Window.height)
             )
+
+    def overlay_button_pressed(self, instance, touch):
+        # Clear the current page content
+        self.clear_page_content()
+
+        # After clearing, call methods_overlay to add the new content
+        self.methods_overlay()
+
+    def overlay_button_back_pressed(self, instance, touch):
+        # Clear the current page content
+        self.clear_page_content()
+
+        # After clearing, call methods_overlay to add the new content
+        self.select_start(self.start_icon, instance, True)
 
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
@@ -204,7 +223,6 @@ class MyApp(App):
 
             # Get the width and height of the window
             print(f"{window_width} + {window_height}")
-
 
             # Variables to represent percentage distances from the window's edges
             from_left = 0.02
@@ -227,8 +245,6 @@ class MyApp(App):
                 pos_hint={'x': scrollview_pos_x / window_width, 'top': scrollview_pos_y / window_height}
             )
 
-
-
             # Create the Label for the verse
             verse_label = Label(
                 text=self.scripture,  # Add the scripture text here
@@ -243,17 +259,18 @@ class MyApp(App):
                     size_hint=(0.2, 0.2),  # Width and height as a percentage of the parent
                     pos_hint={'center_x': 0.5, 'center_y': 0.925})  # Position relative to parent center
 
+            # Bind the overlay button to the new function
+            overlayButtonbg.bind(on_touch_down=self.overlay_button_pressed)
 
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
                 verse_label.height = verse_label.texture_size[1]
                 print(f"Updated verse label height: {verse_label.height}")
 
-
-            clickable_text = ClickableLabel(text="Click Me",
+            clickable_text = ClickableLabel(text="Begin Memorizing",
                                 size_hint=(0.2, 0.2),
+                                color=(0, 0, 0, 1),  # Red color (RGBA)
                                 pos_hint={'center_x': 0.5, 'center_y': 0.925})
-
 
             # Run the update_height function once the current frame is finished
             Clock.schedule_once(update_height, 0)
@@ -261,16 +278,14 @@ class MyApp(App):
             # Add the label to the scrollview
             scroll_view.add_widget(verse_label)
 
-            clickable_text.bind(on_press=self.empty_function)
-            overlayButtonbg.bind(on_touch_down=self.empty_function)
+            clickable_text.bind(on_touch_down=self.overlay_button_pressed)
 
             self.layout.add_widget(overlayButtonbg)
             self.layout.add_widget(scroll_view)
             self.layout.add_widget(clickable_text)
             self.current_page_content.append(scroll_view)
+            self.current_page_content.append(clickable_text)
             self.current_page_content.append(overlayButtonbg)
-
-
 
     def select_search(self, instance, touch, _pass):
         window_width = Window.width
