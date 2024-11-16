@@ -293,26 +293,26 @@ class MyApp(App):
 
 
     def search_verse(self, reference):
-        # import requests
-        # url = f"https://bible-api.com/{reference}"
+        import requests
+        url = f"https://bible-api.com/{reference}"
         
-        # try:
-        #     response = requests.get(url)
-        #     response.raise_for_status()  # Check for request errors
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Check for request errors
             
-        #     # Parse the JSON response
-        #     data = response.json()
-        #     self.reference = reference
-        #     # Get verse text and reference
-        #     verse_text = data.get("text", "Verse not found.")
-        #     return verse_text
+            # Parse the JSON response
+            data = response.json()
+            self.reference = reference
+            # Get verse text and reference
+            verse_text = data.get("text", "Verse not found.")
+            return verse_text
 
-        # except requests.exceptions.RequestException as e:
-        #     print(f"Error fetching the verse: {e}")
-        #     # Show error message in popup
-        #     self.show_error_popup(f"Error fetching verse: {str(e)}")
-        #     return "Error fetching verse."
-        return "Test"
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching the verse: {e}")
+            # Show error message in popup
+            self.show_error_popup(f"Error fetching verse: {str(e)}")
+            return "Error fetching verse."
+        # return "Test"
 
 if __name__ == '__main__':
     MyApp().run()
