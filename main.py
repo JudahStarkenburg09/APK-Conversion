@@ -6,18 +6,13 @@ from kivy.uix.widget import Widget
 from kivy.uix.textinput import TextInput
 from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image
-from kivy.uix.button import ButtonBehavior
+from kivy.uix.button import ButtonBehavior, Button
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.metrics import sp
+from kivy.metrics import dp, sp
 from kivy.uix.popup import Popup
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.label import Label
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
 
 def show_error_popup(self, error_message):
@@ -37,11 +32,10 @@ def show_error_popup(self, error_message):
     popup.content = error_label  # Replace content with the error label
     popup.open()
 
-
 # Create a clickable label by combining ButtonBehavior with Label
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
-    font_size_ratio = NumericProperty(0.15)  # Adjust this ratio as needed
+    font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -121,7 +115,7 @@ class MyApp(App):
     def methods_overlay(self):
         self.methodsTitle = ClickableLabel(
             text="Choose your method",
-            size_hint=(0.4, 0.4),
+            size_hint=(0.065, 0.065),
             pos_hint={'center_x': 0.5, 'center_y': 0.88},
             font_name='impact.ttf',
         )
@@ -133,40 +127,40 @@ class MyApp(App):
         # Create and add the clickable text labels
         read = ClickableLabel(
             text="Read",
-            size_hint=(0.2, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.75},
+            size_hint=(0.055, 0.055),
+            pos_hint={'center_x': 0.5, 'center_y': 0.72},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
         speech = ClickableLabel(
             text="Speech",
-            size_hint=(0.2, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.65},
+            size_hint=(0.055, 0.055),
+            pos_hint={'center_x': 0.5, 'center_y': 0.59},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
         fill_blanks = ClickableLabel(
             text="Fill Blanks",
-            size_hint=(0.2, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.55},
+            size_hint=(0.055, 0.055),
+            pos_hint={'center_x': 0.5, 'center_y': 0.46},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
         audio = ClickableLabel(
             text="Audio",
-            size_hint=(0.2, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.45},
+            size_hint=(0.055, 0.055),
+            pos_hint={'center_x': 0.5, 'center_y': 0.33},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
         back = ClickableLabel(
             text="Back",
-            size_hint=(0.2, 0.2),
-            pos_hint={'center_x': 0.5, 'center_y': 0.35},
+            size_hint=(0.055, 0.055),
+            pos_hint={'center_x': 0.5, 'center_y': 0.2},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
@@ -201,18 +195,26 @@ class MyApp(App):
             )
 
     def overlay_button_pressed(self, instance, touch):
-        # Clear the current page content
-        self.clear_page_content()
+        # Check if the touch is within the bounds of the instance
+        if instance.collide_point(*touch.pos):
+            # Clear the current page content
+            self.clear_page_content()
 
-        # After clearing, call methods_overlay to add the new content
-        self.methods_overlay()
+            # After clearing, call methods_overlay to add the new content
+            self.methods_overlay()
+            return True  # Return True to indicate the event was handled
+
+        return False  # Return False if the touch is not within the widget bounds
 
     def overlay_button_back_pressed(self, instance, touch):
-        # Clear the current page content
-        self.clear_page_content()
+        if instance.collide_point(*touch.pos):
+            # Clear the current page content
+            self.clear_page_content()
 
-        # After clearing, call methods_overlay to add the new content
-        self.select_start(self.start_icon, instance, True)
+            # After clearing, call methods_overlay to add the new content
+            self.select_start(self.start_icon, instance, True)
+
+        return False
 
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
@@ -256,7 +258,7 @@ class MyApp(App):
                 color=(1, 1, 1, 1)  # Adjust text color if necessary
             )
             overlayButtonbg = Image(source='button1-d.png',
-                    size_hint=(0.2, 0.2),  # Width and height as a percentage of the parent
+                    size_hint=(0.325, 0.1),  # Width and height as a percentage of the parent
                     pos_hint={'center_x': 0.5, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
@@ -268,7 +270,7 @@ class MyApp(App):
                 print(f"Updated verse label height: {verse_label.height}")
 
             clickable_text = ClickableLabel(text="Begin Memorizing",
-                                size_hint=(0.2, 0.2),
+                                size_hint=(0.0325, 0.0425),
                                 color=(0, 0, 0, 1),  # Red color (RGBA)
                                 pos_hint={'center_x': 0.5, 'center_y': 0.925})
 
@@ -294,17 +296,18 @@ class MyApp(App):
             self.clear_page_content()
             self.update_selected_icon(self.search_icon, "Search")
             self.search_input = TextInput(
-                hint_text="Type a Bible verse",
+                hint_text="Search for a verse",
                 size_hint=(1, None),
-                height=window_width/16,
+                size_hint_x=.93,
+                height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
                 background_color=(0.66, 0.64, 0.64, 1),  # RGB for #a8a4a4
                 foreground_color=(0, 0, 0, 1),
-                padding=(10, 10),
+                padding=(dp(10), dp(10)),
                 cursor_color=(0, 0, 0, 1),
                 cursor_width=1,
-                font_size=window_width/32  # Change this value to set the font size
+                font_size=sp(25)  # Use sp for font size to ensure it scales with DPI
             )
             self.search_input.bind(on_text_validate=self.on_enter_search)
             self.layout.add_widget(self.search_input)
