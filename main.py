@@ -15,24 +15,22 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
 
-def show_error_popup(self, error_message):
-    # Create a simple popup to display the error message
-    content = Button(text="OK", size_hint=(None, None), size=(200, 100))
-    popup = Popup(
-        title="Error",
-        content=content,
-        size_hint=(None, None),
-        size=(400, 200),
-        auto_dismiss=False
-    )
-    content.bind(on_press=popup.dismiss)  # Close popup when "OK" is pressed
 
-    # Show the error message inside the popup
-    error_label = Label(text=f"An error occurred:\n{error_message}", font_size='18sp')
-    popup.content = error_label  # Replace content with the error label
-    popup.open()
 
 class ClickableLabel(ButtonBehavior, Label):
+    # Add a property for font size
+    font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Bind the font_size to the widget's height
+        self.bind(size=self.update_font_size)
+
+    def update_font_size(self, *args):
+        # Adjust font size relative to the widget's height
+        self.font_size = self.height * self.font_size_ratio
+
+class SmallerClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
     font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
 
@@ -63,6 +61,23 @@ class MyApp(App):
         super().__init__(**kwargs)
         self.scripture="Search to choose your piece of scripture"
         self.reference=""
+
+    def show_error_popup(self, error_message):
+        # Create a simple popup to display the error message
+        content = Button(text="OK", size_hint=(None, None), size=(200, 100))
+        popup = Popup(
+            title="Error",
+            content=content,
+            size_hint=(None, None),
+            size=(400, 200),
+            auto_dismiss=False
+        )
+        content.bind(on_press=popup.dismiss)  # Close popup when "OK" is pressed
+
+        # Show the error message inside the popup
+        error_label = Label(text=f"An error occurred:\n{error_message}", font_size='18sp')
+        popup.content = error_label  # Replace content with the error label
+        popup.open()
 
     def build(self):
         self.layout = FloatLayout()
@@ -274,27 +289,27 @@ class MyApp(App):
 
             memorize_button = Image(source='button1-d.png',
                     size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.3, 'center_y': 0.925})  # Position relative to parent center
+                    pos_hint={'center_x': 0.25, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
             memorize_button.bind(on_touch_down=self.overlay_button_pressed)
 
-            memorize_text = ClickableLabel(text="Memorize",
+            memorize_text = SmallerClickableLabel(text="Memorize",
                                 size_hint=(0.0325, 0.0425),
                                 color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.3, 'center_y': 0.925})
+                                pos_hint={'center_x': 0.25, 'center_y': 0.925})
             
             re_search_button = Image(source='button1-d.png',
                     size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.7, 'center_y': 0.925})  # Position relative to parent center
+                    pos_hint={'center_x': 0.75, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
             re_search_button.bind(on_touch_down=lambda instance, touch: self.call_search(instance, touch))
 
-            re_search_text = ClickableLabel(text="New Verse",
+            re_search_text = SmallerClickableLabel(text="New Verse",
                                 size_hint=(0.0325, 0.0425),
                                 color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.7, 'center_y': 0.925})
+                                pos_hint={'center_x': 0.75, 'center_y': 0.925})
             
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
@@ -385,6 +400,7 @@ class MyApp(App):
             self.reference = reference
             # Get verse text and reference
             verse_text = data.get("text", "Verse not found.")
+            self.reference = data.get("reference", "")
             return verse_text
 
         except requests.exceptions.RequestException as e:
