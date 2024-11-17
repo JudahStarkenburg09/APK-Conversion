@@ -62,6 +62,7 @@ class MyApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.scripture="Search to choose your piece of scripture"
+        self.reference=""
 
     def build(self):
         self.layout = FloatLayout()
@@ -236,7 +237,7 @@ class MyApp(App):
             # Variables to represent percentage distances from the window's edges
             from_left = 0.02
             from_right = 0.02
-            from_top = 0.15
+            from_top = 0.25
             from_bottom = 0.12
 
             # Calculate the width and height based on the distances from the edges
@@ -268,12 +269,12 @@ class MyApp(App):
             referenceText = ClickableLabel(text=f"{self.reference}",
                     size_hint=(0.0315, 0.0415),
                     color=(1, 1, 1, 1), 
-                    pos_hint={'center_x': 0.175, 'center_y': 0.9})
+                    pos_hint={'center_x': 0.275, 'center_y': 0.8})
 
 
             memorize_button = Image(source='button1-d.png',
-                    size_hint=(0.325, 0.1),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.5, 'center_y': 0.925})  # Position relative to parent center
+                    size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
+                    pos_hint={'center_x': 0.3, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
             memorize_button.bind(on_touch_down=self.overlay_button_pressed)
@@ -281,11 +282,11 @@ class MyApp(App):
             memorize_text = ClickableLabel(text="Memorize",
                                 size_hint=(0.0325, 0.0425),
                                 color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.5, 'center_y': 0.925})
+                                pos_hint={'center_x': 0.3, 'center_y': 0.925})
             
             re_search_button = Image(source='button1-d.png',
-                    size_hint=(0.325, 0.1),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.8, 'center_y': 0.925})  # Position relative to parent center
+                    size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
+                    pos_hint={'center_x': 0.7, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
             re_search_button.bind(on_touch_down=lambda instance, touch: self.call_search(instance, touch))
@@ -293,7 +294,7 @@ class MyApp(App):
             re_search_text = ClickableLabel(text="New Verse",
                                 size_hint=(0.0325, 0.0425),
                                 color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.8, 'center_y': 0.925})
+                                pos_hint={'center_x': 0.7, 'center_y': 0.925})
             
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
