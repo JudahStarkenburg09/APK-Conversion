@@ -32,7 +32,7 @@ class ClickableLabel(ButtonBehavior, Label):
 
 class SmallerClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
-    font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
+    font_size_ratio = NumericProperty(0.85)  # Adjust this ratio as needed
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
