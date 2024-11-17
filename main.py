@@ -32,7 +32,6 @@ def show_error_popup(self, error_message):
     popup.content = error_label  # Replace content with the error label
     popup.open()
 
-# Create a clickable label by combining ButtonBehavior with Label
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
     font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
@@ -115,7 +114,7 @@ class MyApp(App):
     def methods_overlay(self):
         self.methodsTitle = ClickableLabel(
             text="Choose your method",
-            size_hint=(0.065, 0.065),
+            size_hint=(0.055, 0.055),
             pos_hint={'center_x': 0.5, 'center_y': 0.88},
             font_name='impact.ttf',
         )
@@ -216,6 +215,14 @@ class MyApp(App):
 
         return False
 
+    def call_search(self, instance, touch):
+        # Check if the touch is within the bounds of the instance
+        if instance.collide_point(*touch.pos):
+
+            self.clear_page_content()
+
+            self.select_search(instance, touch, True)
+
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
         window_height = Window.height
@@ -257,22 +264,42 @@ class MyApp(App):
                 valign='top',
                 color=(1, 1, 1, 1)  # Adjust text color if necessary
             )
-            overlayButtonbg = Image(source='button1-d.png',
+
+            referenceText = ClickableLabel(text=f"{self.reference}",
+                    size_hint=(0.0315, 0.0415),
+                    color=(1, 1, 1, 1), 
+                    pos_hint={'center_x': 0.175, 'center_y': 0.9})
+
+
+            memorize_button = Image(source='button1-d.png',
                     size_hint=(0.325, 0.1),  # Width and height as a percentage of the parent
                     pos_hint={'center_x': 0.5, 'center_y': 0.925})  # Position relative to parent center
 
             # Bind the overlay button to the new function
-            overlayButtonbg.bind(on_touch_down=self.overlay_button_pressed)
+            memorize_button.bind(on_touch_down=self.overlay_button_pressed)
 
+            memorize_text = ClickableLabel(text="Memorize",
+                                size_hint=(0.0325, 0.0425),
+                                color=(0, 0, 0, 1),
+                                pos_hint={'center_x': 0.5, 'center_y': 0.925})
+            
+            re_search_button = Image(source='button1-d.png',
+                    size_hint=(0.325, 0.1),  # Width and height as a percentage of the parent
+                    pos_hint={'center_x': 0.8, 'center_y': 0.925})  # Position relative to parent center
+
+            # Bind the overlay button to the new function
+            re_search_button.bind(on_touch_down=lambda instance, touch: self.call_search(instance, touch))
+
+            re_search_text = ClickableLabel(text="New Verse",
+                                size_hint=(0.0325, 0.0425),
+                                color=(0, 0, 0, 1),
+                                pos_hint={'center_x': 0.8, 'center_y': 0.925})
+            
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
                 verse_label.height = verse_label.texture_size[1]
                 print(f"Updated verse label height: {verse_label.height}")
 
-            clickable_text = ClickableLabel(text="Begin Memorizing",
-                                size_hint=(0.0325, 0.0425),
-                                color=(0, 0, 0, 1),  # Red color (RGBA)
-                                pos_hint={'center_x': 0.5, 'center_y': 0.925})
 
             # Run the update_height function once the current frame is finished
             Clock.schedule_once(update_height, 0)
@@ -280,14 +307,20 @@ class MyApp(App):
             # Add the label to the scrollview
             scroll_view.add_widget(verse_label)
 
-            clickable_text.bind(on_touch_down=self.overlay_button_pressed)
+            memorize_text.bind(on_touch_down=self.overlay_button_pressed)
 
-            self.layout.add_widget(overlayButtonbg)
+            self.layout.add_widget(memorize_button)
+            self.layout.add_widget(referenceText)
+            self.layout.add_widget(re_search_button)
             self.layout.add_widget(scroll_view)
-            self.layout.add_widget(clickable_text)
+            self.layout.add_widget(memorize_text)
+            self.layout.add_widget(re_search_text)
             self.current_page_content.append(scroll_view)
-            self.current_page_content.append(clickable_text)
-            self.current_page_content.append(overlayButtonbg)
+            self.current_page_content.append(referenceText)
+            self.current_page_content.append(memorize_text)
+            self.current_page_content.append(re_search_text)
+            self.current_page_content.append(memorize_button)
+            self.current_page_content.append(re_search_button)
 
     def select_search(self, instance, touch, _pass):
         window_width = Window.width
@@ -309,6 +342,7 @@ class MyApp(App):
                 cursor_width=1,
                 font_size=sp(25)  # Use sp for font size to ensure it scales with DPI
             )
+            
             self.search_input.bind(on_text_validate=self.on_enter_search)
             self.layout.add_widget(self.search_input)
             self.current_page_content.append(self.search_input)
