@@ -32,7 +32,7 @@ class ClickableLabel(ButtonBehavior, Label):
 
 class SmallerClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
-    font_size_ratio = NumericProperty(0.85)  # Adjust this ratio as needed
+    font_size_ratio = NumericProperty(0.75)  # Adjust this ratio as needed
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -179,7 +179,6 @@ class MyApp(App):
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
-
 
 
         # Bind the button to the empty function
@@ -347,7 +346,7 @@ class MyApp(App):
             self.search_input = TextInput(
                 hint_text="Search for a verse",
                 size_hint=(1, None),
-                size_hint_x=.93,
+                size_hint_x=.94,
                 height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
@@ -358,10 +357,98 @@ class MyApp(App):
                 cursor_width=1,
                 font_size=sp(25)  # Use sp for font size to ensure it scales with DPI
             )
+
+            self.switch_versions = Image(source='adjust.png',
+                size_hint=(0.08, 0.08),  # Width and height as a percentage of the parent
+                pos_hint={'center_x': 0.97, 'center_y': 0.949})  # Position relative to parent center
             
+            self.switch_versions.bind(on_touch_down=lambda instance, touch: self.set_version(instance, touch))
+            
+            self.layout.add_widget(self.switch_versions)
             self.search_input.bind(on_text_validate=self.on_enter_search)
             self.layout.add_widget(self.search_input)
             self.current_page_content.append(self.search_input)
+            self.current_page_content.append(self.switch_versions)
+
+    def select_vname(self, ):
+        ''
+
+    def set_version(self, instance, touch):
+        if instance.collide_point(*touch.pos):
+            self.clear_page_content()
+
+            _1v = ClickableLabel(
+                text="1",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.92},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            _2v = ClickableLabel(
+                text="2",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.79},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            _3v = ClickableLabel(
+                text="3",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.66},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            _4v = ClickableLabel(
+                text="4",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.53},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            _5v = ClickableLabel(
+                text="5",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.4},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            select = ClickableLabel(
+                text="Select",
+                size_hint=(0.055, 0.055),
+                pos_hint={'center_x': 0.5, 'center_y': 0.27},
+                font_name='impact.ttf',
+                color=(1, 1, 1, 0.8)
+            )
+
+            select.bind(on_touch_down=lambda instance, touch: self.select_search(instance, touch, True))
+
+            self.layout.add_widget(select)
+            self.current_page_content.append(select)
+            self.layout.add_widget(_1v)
+            self.layout.add_widget(_2v)
+            self.layout.add_widget(_3v)
+            self.layout.add_widget(_4v)
+            self.layout.add_widget(_5v)
+
+
+            self.current_page_content.append(_1v)
+            self.current_page_content.append(_2v)
+            self.current_page_content.append(_3v)
+            self.current_page_content.append(_4v)
+            self.current_page_content.append(_5v)
+
+
+            with self.layout.canvas.before:
+                Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
+                self.rect = Rectangle(
+                    pos=(0, 0),  # bottom-left corner
+                    size=(Window.width, Window.height)
+                )
 
     def update_selected_icon(self, selected_icon, page_name):
         # Reset all icons to default state
@@ -389,7 +476,7 @@ class MyApp(App):
 
     def search_verse(self, reference):
         import requests
-        url = f"https://bible-api.com/{reference}"
+        url = f"https://bible-api.com/{reference}?verse_numbers=true"
         
         try:
             response = requests.get(url)
