@@ -360,7 +360,7 @@ class MyApp(App):
 
             self.switch_versions = Image(source='adjust.png',
                 size_hint=(0.12, 0.12),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.97, 'center_y': 0.949})  # Position relative to parent center
+                pos_hint={'center_x': 0.94, 'center_y': 0.962})  # Position relative to parent center
             
             self.switch_versions.bind(on_touch_down=lambda instance, touch: self.set_version(instance, touch))
             
