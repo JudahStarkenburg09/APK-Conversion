@@ -346,7 +346,7 @@ class MyApp(App):
             self.search_input = TextInput(
                 hint_text="Search for a verse",
                 size_hint=(1, None),
-                size_hint_x=.883,
+                size_hint_x=.878,
                 height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
