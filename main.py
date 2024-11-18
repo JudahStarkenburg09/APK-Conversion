@@ -346,7 +346,7 @@ class MyApp(App):
             self.search_input = TextInput(
                 hint_text="Search for a verse",
                 size_hint=(1, None),
-                size_hint_x=.885,
+                size_hint_x=.883,
                 height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
@@ -360,7 +360,7 @@ class MyApp(App):
 
             self.switch_versions = Image(source='adjust.png',
                 size_hint=(0.115, 0.115),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.94, 'center_y': 0.962})  # Position relative to parent center
+                pos_hint={'center_x': 0.935, 'center_y': 0.9605})  # Position relative to parent center
             
             self.switch_versions.bind(on_touch_down=lambda instance, touch: self.set_version(instance, touch))
             
