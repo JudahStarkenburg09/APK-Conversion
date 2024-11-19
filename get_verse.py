@@ -1,7 +1,16 @@
+import warnings
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 import re
-from bs4 import BeautifulSoup
+
+
+
+
 
 def search_verse(version, reference):
+    # Because we are using an html parser for an xml file, we need to suppress the warnings against it (because it works)
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+
     # Mapping versions to corresponding XML files
     versionToXML = {
         "ESV": 'Bible_English_ESV.xml',
@@ -19,8 +28,8 @@ def search_verse(version, reference):
     with open(xml_file, 'r', encoding='utf-8') as f:
         data = re.sub(r'xmlns(:\w+)?="[^"]+"', '', f.read(), count=1)
     
-    # Parse the XML
-    Bs_data = BeautifulSoup(data, "lxml-xml")
+    # Your XML parsing code
+    Bs_data = BeautifulSoup(data, "html.parser")
     
     # Regex for scripture reference input (book name, chapter, and verse(s))
     match = re.match(r"^\s*(\d?\s*\w+)\s*(\d{1,3}(?:-\d{1,3})?)\s*(?::(\d{1,3}(?:-\d{1,3})?)?)?\s*$", reference)
@@ -32,19 +41,19 @@ def search_verse(version, reference):
         result = []
         try:
             # Find book using lowercase comparison (case-insensitive search)
-            book = Bs_data.find("BIBLEBOOK", {"bname": lambda x: x and x.lower() == bk})
+            book = Bs_data.find("biblebook", {"bname": lambda x: x and x.lower() == bk})
             if not book:
                 return f"Book '{bk}' not found.", f"Book '{bk}' not found."
             
             # Find chapter based on chapter number
-            chapter = book.find("CHAPTER", {"cnumber": chpt})
+            chapter = book.find("chapter", {"cnumber": chpt})
             if not chapter:
                 return f"Chapter '{chpt}' not found.", f"Chapter '{chpt}' not found."
             
             # If specific verses are requested
             if vs:
                 range_match = re.match(r"(\d+)-(\d+)", vs)
-                verses = chapter.find_all("VERS")
+                verses = chapter.find_all("vers")
                 if range_match:
                     start_verse = int(range_match.group(1))
                     end_verse = int(range_match.group(2))
@@ -53,14 +62,14 @@ def search_verse(version, reference):
                         if start_verse <= vnum <= end_verse:
                             result.append(f"{v['vnumber']}: {v.text.strip()}")
                 else:
-                    verse = chapter.find("VERS", {"vnumber": vs})
+                    verse = chapter.find("vers", {"vnumber": vs})
                     if verse:
                         result.append(f"{verse['vnumber']}: {verse.text.strip()}")
                     else:
                         return f"Verse '{vs}' not found.", f"Verse '{vs}' not found."
             else:
                 # If no specific verse is provided, return all verses from the chapter
-                for v in chapter.find_all("VERS"):
+                for v in chapter.find_all("vers"):
                     result.append(f"{v['vnumber']}: {v.text.strip()}")
             
             # Combine the results into a single string with spaces in between
