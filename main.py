@@ -16,11 +16,12 @@ from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
 try:
     from bs4 import BeautifulSoup
+    import lxml
 except ImportError:
     from subprocess import call
-    call(['pip', 'install', 'beautifulsoup4'])
+    call(['pip', 'install', 'beautifulsoup4', 'lxml'])
     from bs4 import BeautifulSoup
-
+    import lxml
 
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
