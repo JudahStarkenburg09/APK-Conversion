@@ -61,6 +61,30 @@ class MyApp(App):
         super().__init__(**kwargs)
         self.scripture="Search to choose your piece of scripture"
         self.reference=""
+        self.defVersion = "ESV"
+        self.version = "ESV" # Default Version
+        self.selected_version = "ESV"
+        self.superscript_dict = {
+            "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
+            "10": "¹⁰", "11": "¹¹", "12": "¹²", "13": "¹³", "14": "¹⁴", "15": "¹⁵", "16": "¹⁶", "17": "¹⁷", "18": "¹⁸", "19": "¹⁹",
+            "20": "²⁰", "21": "²¹", "22": "²²", "23": "²³", "24": "²⁴", "25": "²⁵", "26": "²⁶", "27": "²⁷", "28": "²⁸", "29": "²⁹",
+            "30": "³⁰", "31": "³¹", "32": "³²", "33": "³³", "34": "³⁴", "35": "³⁵", "36": "³⁶", "37": "³⁷", "38": "³⁸", "39": "³⁹",
+            "40": "⁴⁰", "41": "⁴¹", "42": "⁴²", "43": "⁴³", "44": "⁴⁴", "45": "⁴⁵", "46": "⁴⁶", "47": "⁴⁷", "48": "⁴⁸", "49": "⁴⁹",
+            "50": "⁵⁰", "51": "⁵¹", "52": "⁵²", "53": "⁵³", "54": "⁵⁴", "55": "⁵⁵", "56": "⁵⁶", "57": "⁵⁷", "58": "⁵⁸", "59": "⁵⁹",
+            "60": "⁶⁰", "61": "⁶¹", "62": "⁶²", "63": "⁶³", "64": "⁶⁴", "65": "⁶⁵", "66": "⁶⁶", "67": "⁶⁷", "68": "⁶⁸", "69": "⁶⁹",
+            "70": "⁷⁰", "71": "⁷¹", "72": "⁷²", "73": "⁷³", "74": "⁷⁴", "75": "⁷⁵", "76": "⁷⁶", "77": "⁷⁷", "78": "⁷⁸", "79": "⁷⁹",
+            "80": "⁸⁰", "81": "⁸¹", "82": "⁸²", "83": "⁸³", "84": "⁸⁴", "85": "⁸⁵", "86": "⁸⁶", "87": "⁸⁷", "88": "⁸⁸", "89": "⁸⁹",
+            "90": "⁹⁰", "91": "⁹¹", "92": "⁹²", "93": "⁹³", "94": "⁹⁴", "95": "⁹⁵", "96": "⁹⁶", "97": "⁹⁷", "98": "⁹⁸", "99": "⁹⁹",
+            "100": "¹⁰⁰", "101": "¹⁰¹", "102": "¹⁰²", "103": "¹⁰³", "104": "¹⁰⁴", "105": "¹⁰⁵", "106": "¹⁰⁶", "107": "¹⁰⁷", "108": "¹⁰⁸", 
+            "109": "¹⁰⁹", "110": "¹¹⁰", "111": "¹¹¹", "112": "¹¹²", "113": "¹¹³", "114": "¹¹⁴", "115": "¹¹⁵", "116": "¹¹⁶", "117": "¹¹⁷", 
+            "118": "¹¹⁸", "119": "¹¹⁹", "120": "¹²⁰", "121": "¹²¹", "122": "¹²²", "123": "¹²³", "124": "¹²⁴", "125": "¹²⁵", "126": "¹²⁶", 
+            "127": "¹²⁷", "128": "¹²⁸", "129": "¹²⁹", "130": "¹³⁰", "131": "¹³¹", "132": "¹³²", "133": "¹³³", "134": "¹³⁴", "135": "¹³⁵", 
+            "136": "¹³⁶", "137": "¹³⁷", "138": "¹³⁸", "139": "¹³⁹", "140": "¹⁴⁰", "141": "¹⁴¹", "142": "¹⁴²", "143": "¹⁴³", "144": "¹⁴⁴", 
+            "145": "¹⁴⁵", "146": "¹⁴⁶", "147": "¹⁴⁷", "148": "¹⁴⁸", "149": "¹⁴⁹", "150": "¹⁵⁰", "151": "¹⁵¹", "152": "¹⁵²", "153": "¹⁵³", 
+            "154": "¹⁵⁴", "155": "¹⁵⁵", "156": "¹⁵⁶", "157": "¹⁵⁷", "158": "¹⁵⁸", "159": "¹⁵⁹", "160": "¹⁶⁰", "161": "¹⁶¹", "162": "¹⁶²", 
+            "163": "¹⁶³", "164": "¹⁶⁴", "165": "¹⁶⁵", "166": "¹⁶⁶", "167": "¹⁶⁷", "168": "¹⁶⁸", "169": "¹⁶⁹", "170": "¹⁷⁰", "171": "¹⁷¹", 
+            "172": "¹⁷²", "173": "¹⁷³", "174": "¹⁷⁴", "175": "¹⁷⁵", "176": "¹⁷⁶"
+        }
 
     def show_error_popup(self, error_message):
         # Create a simple popup to display the error message
@@ -346,7 +370,7 @@ class MyApp(App):
             self.search_input = TextInput(
                 hint_text="Search for a verse",
                 size_hint=(1, None),
-                size_hint_x=.878,
+                size_hint_x=.883,
                 height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
@@ -375,74 +399,95 @@ class MyApp(App):
 
     def set_version(self, instance, touch):
         if instance.collide_point(*touch.pos):
+            print("Touch detected on the version selection screen.")
             self.clear_page_content()
 
-            _1v = ClickableLabel(
-                text="1",
-                size_hint=(0.055, 0.055),
-                pos_hint={'center_x': 0.5, 'center_y': 0.92},
-                font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
-            )
+            # Create clickable labels for versions
+            version_labels = [
+                {"text": "ESV", "pos_y": 0.92},
+                {"text": "NKJV", "pos_y": 0.79},
+                {"text": "NLT", "pos_y": 0.66},
+                {"text": "RV09", "pos_y": 0.53},
+                {"text": "Select", "pos_y": 0.27},  # Submit button
+            ]
 
-            _2v = ClickableLabel(
-                text="2",
-                size_hint=(0.055, 0.055),
-                pos_hint={'center_x': 0.5, 'center_y': 0.79},
-                font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
-            )
+            # Create a list to store the clickable labels
+            self.version_widgets = []
 
-            _3v = ClickableLabel(
-                text="3",
-                size_hint=(0.055, 0.055),
-                pos_hint={'center_x': 0.5, 'center_y': 0.66},
-                font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
-            )
 
-            _4v = ClickableLabel(
-                text="4",
-                size_hint=(0.055, 0.055),
-                pos_hint={'center_x': 0.5, 'center_y': 0.53},
-                font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
-            )
+            def label_click(instance, touch, version):
+                print(f"Label clicked: {version}")
 
-            _5v = ClickableLabel(
-                text="5",
-                size_hint=(0.055, 0.055),
-                pos_hint={'center_x': 0.5, 'center_y': 0.4},
-                font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
-            )
+                # Only proceed if the touch is within the bounds of the version label
+                if instance.collide_point(*touch.pos):
+                    print(f"Touch position: {touch.pos}")
+                    # If the label clicked is already the selected one, unselect it
+                    if self.selected_version == version:
+                        print(f"Unselecting {version}.")
+                        # Reset the color of the clicked label and clear the selection
+                        instance.color = (1, 1, 1, 0.8)
+                        self.selected_version = None
+                    else:
+                        # Reset all labels to their normal color
+                        for label in self.version_widgets:
+                            label.color = (1, 1, 1, 0.8)  # Reset all to white
+                        # Set the clicked label to blue
+                        instance.color = (0, 0, 1, 1)
+                        # Save the selected version
+                        self.selected_version = version
 
-            select = ClickableLabel(
+            # Create and add the clickable labels to the layout
+            for version in version_labels:
+                version_label = ClickableLabel(
+                    text=version["text"],
+                    size_hint=(0.055, 0.055),
+                    pos_hint={'center_x': 0.5, 'center_y': version["pos_y"]},
+                    font_name='impact.ttf',
+                    color=(1, 1, 1, 0.8)  # Default color
+                )
+
+                if version["text"] == self.selected_version:
+                    version_label.color = (0, 0, 1, 1)
+                    self.selected_version = self.selected_version
+
+                # Only bind the click event to labels if no version is selected yet
+                if version["text"] != "Select":
+                    version_label.bind(on_touch_down=lambda instance, touch, version=version["text"]: label_click(instance, touch, version))
+
+                # Add the label to the layout and the list of widgets
+                self.layout.add_widget(version_label)
+                self.current_page_content.append(version_label)
+                self.version_widgets.append(version_label)
+
+            # Create the "Select" button for submitting the version choice
+            select_button = ClickableLabel(
                 text="Select",
                 size_hint=(0.055, 0.055),
                 pos_hint={'center_x': 0.5, 'center_y': 0.27},
                 font_name='impact.ttf',
-                color=(1, 1, 1, 0.8)
+                color=(0.5, 0.5, 0.5, 0.8)  # Initially disabled (gray)
             )
 
-            select.bind(on_touch_down=lambda instance, touch: self.select_search(instance, touch, True))
+            # Only bind the select action if a version has been selected
+            def call_select_search(instance, touch):
+                if instance.collide_point(*touch.pos):
+                    print(f"================\nSelected {self.selected_version}\n================ ")
+                    self.version = self.selected_version
+                    self.select_search(instance, touch, _pass=True)
+            select_button.bind(on_touch_down=lambda instance, touch: call_select_search(instance, touch))
 
-            self.layout.add_widget(select)
-            self.current_page_content.append(select)
-            self.layout.add_widget(_1v)
-            self.layout.add_widget(_2v)
-            self.layout.add_widget(_3v)
-            self.layout.add_widget(_4v)
-            self.layout.add_widget(_5v)
+            # Debug print to check button status
+            if self.selected_version:
+                print("A version is selected, enabling the 'Select' button.")
+                select_button.color = (1, 1, 1, 0.8)  # Enable color (white)
+            else:
+                print("No version selected, 'Select' button remains disabled.")
 
+            # Add the "Select" button to the layout
+            self.layout.add_widget(select_button)
+            self.current_page_content.append(select_button)
 
-            self.current_page_content.append(_1v)
-            self.current_page_content.append(_2v)
-            self.current_page_content.append(_3v)
-            self.current_page_content.append(_4v)
-            self.current_page_content.append(_5v)
-
-
+            # Add the background color to the layout
             with self.layout.canvas.before:
                 Color(0.66, 0.64, 0.64, 0.25)  # Set your desired color (RGB values between 0 and 1)
                 self.rect = Rectangle(
@@ -475,27 +520,13 @@ class MyApp(App):
         print("Empty Function")
 
     def search_verse(self, reference):
-        import requests
-        url = f"https://bible-api.com/{reference}?verse_numbers=true"
-        
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Check for request errors
-            
-            # Parse the JSON response
-            data = response.json()
-            self.reference = reference
-            # Get verse text and reference
-            verse_text = data.get("text", "Verse not found.")
-            self.reference = data.get("reference", "")
-            return verse_text
+        import get_verse, re
 
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching the verse: {e}")
-            # Show error message in popup
-            self.show_error_popup(f"Error fetching verse: {str(e)}")
-            return "Error fetching verse."
-        # return "Test"
+        resultList, resultStr = get_verse.search_verse(self.version, reference)
+        resultStr = re.sub(r"(\d+): ", lambda match: self.superscript_dict.get(match.group(1), match.group(1) + ": "), resultStr)
+        return resultStr
+        
+
 
 if __name__ == '__main__':
     MyApp().run()
