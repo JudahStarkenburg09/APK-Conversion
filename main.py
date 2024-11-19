@@ -14,7 +14,12 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
-
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    from subprocess import call
+    call(['pip', 'install', 'beautifulsoup4'])
+    from bs4 import BeautifulSoup
 
 
 class ClickableLabel(ButtonBehavior, Label):
