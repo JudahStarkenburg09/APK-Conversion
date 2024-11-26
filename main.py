@@ -168,17 +168,17 @@ class MyApp(App):
             y=70
         )
         with left_rectangle.canvas:
-            Color(1, 0, 0, 1)  # Red color
+            Color(1, 0, 0, .7)  # Red color
             self.rect_left = Rectangle(size=left_rectangle.size, pos=left_rectangle.pos)
 
         # Add a touchable blue rectangle on the right half
         right_rectangle = Widget(
             size_hint=(None, None),
             size=(Window.width * 0.5, Window.height),  # Occupy the right half
-            pos=(400, 70)  # Positioned at the top right corner
+            pos=(600, 70)  # Positioned at the top right corner
         )
         with right_rectangle.canvas:
-            Color(0, 0, 1, 1)  # Blue color
+            Color(0, 0, 1, .7)  # Blue color
             self.rect_right = Rectangle(size=right_rectangle.size, pos=right_rectangle.pos)
 
         # Add both rectangles to the layout
