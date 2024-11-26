@@ -25,7 +25,7 @@ except ImportError:
 
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
-    font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
+    font_size_ratio = NumericProperty(0.95)  # Adjust this ratio as needed
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -136,7 +136,7 @@ class MyApp(App):
             text="Back",
             font_size='14sp',
             size_hint=(None, None),
-            size=(100, 40),  # Set the button size
+            size=(300, 140),  # Set the button size
             pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
         )
         back_button.bind(on_press=lambda instance: self.call_start_no_exceptions(instance))  
@@ -175,7 +175,7 @@ class MyApp(App):
         right_rectangle = Widget(
             size_hint=(None, None),
             size=(Window.width * 0.5, Window.height),  # Occupy the right half
-            pos=(570, 70)  # Positioned at the top right corner
+            pos=(520, 70)  # Positioned at the top right corner
         )
         with right_rectangle.canvas:
             Color(0, 0, 1, .7)  # Blue color
@@ -567,7 +567,7 @@ class MyApp(App):
             for version in version_labels:
                 version_label = ClickableLabel(
                     text=version["text"],
-                    size_hint=(0.055, 0.055),
+                    size_hint=(0.065, 0.065),
                     pos_hint={'center_x': 0.5, 'center_y': version["pos_y"]},
                     font_name='impact.ttf',
                     color=(1, 1, 1, 0.6)  # Default color
