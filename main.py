@@ -1,3 +1,4 @@
+import re
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.label import Label
@@ -16,6 +17,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
 try:
     from bs4 import BeautifulSoup
+
 except ImportError:
     from subprocess import call
     call(['pip', 'install', 'beautifulsoup4'])
@@ -65,6 +67,7 @@ class MyApp(App):
         super().__init__(**kwargs)
         self.scripture="Search to choose your piece of scripture"
         self.reference=""
+        self.current_sentence_index = 0
         self.defVersion = "ESV"
         self.version = "ESV" # Default Version
         self.selected_version = "ESV"
@@ -89,6 +92,122 @@ class MyApp(App):
             "163": "¹⁶³", "164": "¹⁶⁴", "165": "¹⁶⁵", "166": "¹⁶⁶", "167": "¹⁶⁷", "168": "¹⁶⁸", "169": "¹⁶⁹", "170": "¹⁷⁰", "171": "¹⁷¹", 
             "172": "¹⁷²", "173": "¹⁷³", "174": "¹⁷⁴", "175": "¹⁷⁵", "176": "¹⁷⁶"
         }
+
+    def read_verse_by_sentence(self):
+        self.clear_page_content()
+        self.update_selected_icon(self.start_icon, "Read Mode")
+
+        # Split the scripture into sentences
+        sentences = re.split(r'\.\s|"(?=\s|$)', self.scripture)
+        self.current_sentence_index = 0
+
+        # Add the "Previous" label
+        prev_label = Label(
+            text="< Previous",
+            font_size='14sp',
+            color=(1, 1, 1, 0.7),  # Slightly transparent white
+            size_hint=(None, None),
+            size=(Window.width * 0.3, 30),
+            pos=(20, Window.height - 50),  # Top-left corner
+            halign='left',
+            valign='middle'
+        )
+        prev_label.text_size = prev_label.size  # Ensure proper text wrapping
+        self.layout.add_widget(prev_label)
+        self.current_page_content.append(prev_label)
+
+        # Add the "Next" label
+        next_label = Label(
+            text="Next >",
+            font_size='14sp',
+            color=(1, 1, 1, 0.7),  # Slightly transparent white
+            size_hint=(None, None),
+            size=(Window.width * 0.3, 30),
+            pos=(540, Window.height - 50),  # Top-right corner
+            halign='right',
+            valign='middle'
+        )
+        next_label.text_size = next_label.size  # Ensure proper text wrapping
+        self.layout.add_widget(next_label)
+        self.current_page_content.append(next_label)
+
+        # Add the back button
+        back_button = Button(
+            text="Back",
+            font_size='14sp',
+            size_hint=(None, None),
+            size=(100, 40),  # Set the button size
+            pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
+        )
+        back_button.bind(on_press=lambda instance: self.call_start_no_exceptions(instance))  
+        self.layout.add_widget(back_button)
+        self.current_page_content.append(back_button)
+
+        # Display the first sentence
+        self.sentence_label2 = Label(
+            text=re.sub(r'\n', '', sentences[self.current_sentence_index]),
+            font_size='18sp',
+            font_name='noto-sans.ttf',
+            size_hint=(1, None),  # Make sure height adjusts to content
+            height=Window.height * 0.2,  # Adjust this to give enough space
+            pos_hint={'center_x': 0.5, 'center_y': 0.6},
+            halign='center',
+            valign='middle',
+        )
+        self.sentence_label2.text_size = (Window.width * 0.8, None)  # Adjust width to make sure it wraps correctly
+
+        # Ensure the Label wraps text and respects the layout
+        self.layout.add_widget(self.sentence_label2)
+        self.current_page_content.append(self.sentence_label2)
+
+        # Add a touchable red rectangle on the left half
+        left_rectangle = Widget(
+            size_hint=(None, None),
+            size=(Window.width * 0.5, Window.height),  # Occupy the left half
+            pos_hint={'x': 0, 'top': 1},  # Positioned at the top left corner
+            y=70
+        )
+        with left_rectangle.canvas:
+            Color(1, 0, 0, 1)  # Red color
+            self.rect_left = Rectangle(size=left_rectangle.size, pos=left_rectangle.pos)
+
+        # Add a touchable blue rectangle on the right half
+        right_rectangle = Widget(
+            size_hint=(None, None),
+            size=(Window.width * 0.5, Window.height),  # Occupy the right half
+            pos=(400, 70)  # Positioned at the top right corner
+        )
+        with right_rectangle.canvas:
+            Color(0, 0, 1, 1)  # Blue color
+            self.rect_right = Rectangle(size=right_rectangle.size, pos=right_rectangle.pos)
+
+        # Add both rectangles to the layout
+        self.layout.add_widget(left_rectangle)
+        self.layout.add_widget(right_rectangle)
+        self.current_page_content.append(left_rectangle)
+        self.current_page_content.append(right_rectangle)
+
+        # Add a touch listener to navigate between sentences
+        def navigate_sentences(instance, touch):
+            try:
+                if left_rectangle.collide_point(touch.x, touch.y):
+                    if self.current_sentence_index > 0:
+                        self.current_sentence_index -= 1
+                        self.sentence_label2.text = sentences[self.current_sentence_index]
+                elif right_rectangle.collide_point(touch.x, touch.y):
+                    if self.current_sentence_index < len(sentences) - 1:
+                        self.current_sentence_index += 1
+                        self.sentence_label2.text = sentences[self.current_sentence_index]
+            except IndexError:
+                try:
+                    self.sentence_label2.text = sentences[self.current_sentence_index]
+                except IndexError:
+                    self.sentence_label2.text = "Something went wrong. Please try again."
+
+        self.layout.bind(on_touch_down=navigate_sentences)
+
+
+
 
     def show_error_popup(self, error_message):
         # Create a simple popup to display the error message
@@ -210,7 +329,7 @@ class MyApp(App):
 
 
         # Bind the button to the empty function
-        read.bind(on_press=self.empty_function)
+        read.bind(on_touch_down=lambda instance, touch: self.read_verse_by_sentence() if instance.collide_point(touch.x, touch.y) else None)
         speech.bind(on_press=self.empty_function)
         fill_blanks.bind(on_press=self.empty_function)
         audio.bind(on_press=self.empty_function)
@@ -266,10 +385,16 @@ class MyApp(App):
 
             self.select_search(instance, touch, True)
 
+    def call_start_no_exceptions(self, instance):
+        # Call select_start with _pass set to True
+        self.select_start(instance=instance, touch=None, _pass=True)
+
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
         window_height = Window.height
-        if instance.collide_point(touch.x, touch.y) or _pass:
+
+        # Check if the touch is valid or the _pass flag is True
+        if _pass or (touch and instance.collide_point(touch.x, touch.y)):
             self.clear_page_content()
             self.update_selected_icon(self.start_icon, "Start")
 
@@ -301,11 +426,12 @@ class MyApp(App):
             verse_label = Label(
                 text=self.scripture,  # Add the scripture text here
                 font_size=f'{window_width/44}sp',
+                font_name='noto-sans.ttf',
                 size_hint_y=None,  # Make the label grow vertically
                 text_size=(scrollview_width, None),  # Text wraps at the width of the scroll view
                 halign='left',
                 valign='top',
-                color=(1, 1, 1, 1)  # Adjust text color if necessary
+                color=(1, 1, 1, 1),  # Adjust text color if necessary
             )
 
             referenceText = ClickableLabel(text=f"{self.reference}",
@@ -374,7 +500,7 @@ class MyApp(App):
             self.search_input = TextInput(
                 hint_text="Search for a verse",
                 size_hint=(1, None),
-                size_hint_x=.883,
+                size_hint_x=.877,
                 height=dp(50),  # Adjust the dp value for a consistent height across devices
                 pos_hint={'x': 0, 'top': 0.99},
                 multiline=False,
@@ -397,9 +523,6 @@ class MyApp(App):
             self.layout.add_widget(self.search_input)
             self.current_page_content.append(self.search_input)
             self.current_page_content.append(self.switch_versions)
-
-    def select_vname(self, ):
-        ''
 
     def set_version(self, instance, touch):
         if instance.collide_point(*touch.pos):
@@ -429,14 +552,14 @@ class MyApp(App):
                     if self.selected_version == version:
                         print(f"Unselecting {version}.")
                         # Reset the color of the clicked label and clear the selection
-                        instance.color = (1, 1, 1, 0.8)
+                        instance.color = (1, 1, 1, 0.6)
                         self.selected_version = None
                     else:
                         # Reset all labels to their normal color
                         for label in self.version_widgets:
-                            label.color = (1, 1, 1, 0.8)  # Reset all to white
-                        # Set the clicked label to blue
-                        instance.color = (0, 0, 1, 1)
+                            label.color = (1, 1, 1, 0.6)  # Reset all to white
+
+                        instance.color = (1, 1, 1, 1)
                         # Save the selected version
                         self.selected_version = version
 
@@ -447,11 +570,11 @@ class MyApp(App):
                     size_hint=(0.055, 0.055),
                     pos_hint={'center_x': 0.5, 'center_y': version["pos_y"]},
                     font_name='impact.ttf',
-                    color=(1, 1, 1, 0.8)  # Default color
+                    color=(1, 1, 1, 0.6)  # Default color
                 )
 
                 if version["text"] == self.selected_version:
-                    version_label.color = (0, 0, 1, 1)
+                    version_label.color = (1, 1, 1, 1)
                     self.selected_version = self.selected_version
 
                 # Only bind the click event to labels if no version is selected yet
