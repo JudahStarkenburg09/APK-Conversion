@@ -175,7 +175,7 @@ class MyApp(App):
         right_rectangle = Widget(
             size_hint=(None, None),
             size=(Window.width * 0.5, Window.height),  # Occupy the right half
-            pos=(600, 70)  # Positioned at the top right corner
+            pos=(570, 70)  # Positioned at the top right corner
         )
         with right_rectangle.canvas:
             Color(0, 0, 1, .7)  # Blue color
