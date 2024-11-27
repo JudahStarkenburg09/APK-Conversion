@@ -15,7 +15,7 @@ def search_verse(version, reference):
     versionToXML = {
         "ESV": 'Bible_English_ESV.xml',
         "NKJV": "Bible_English_NKJV.xml",
-        "NLT": "Bible_English_NLT.xml",
+        "MSG": "Bible_English_MSG.xml",
         "RV09": "Bible_Espanol_RV09.xml"
     }
 
@@ -85,7 +85,7 @@ def search_verse(version, reference):
 if __name__ == "__main__":
     while True:
         # Taking user input for version and scripture reference
-        vrs = input("Enter Version (e.g., ESV, NKJV, NLT, RV09): ")
+        vrs = input("Enter Version (e.g., ESV, NKJV, MSG, RV09): ")
         inp = input("Enter scripture reference (e.g., Genesis 1:1-2): ")  # Regex for reference input
 
         resultList, resultStr = search_verse(vrs, inp)

@@ -1,20 +1,32 @@
-import re
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.widget import Widget
+from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
+from kivy.metrics import sp  # Import sp for scalable pixel
+from kivy.app import App
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
+from kivy.metrics import sp  # Import sp for scalable pixel
+from kivy.core.window import Window
+from kivy.uix.widget import Widget
 from kivy.graphics import Rectangle, Color
 from kivy.uix.image import Image
-from kivy.uix.button import ButtonBehavior, Button
+from kivy.uix.button import ButtonBehavior
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
-from kivy.metrics import dp, sp
-from kivy.uix.popup import Popup
+from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
+from kivy.uix.screenmanager import ScreenManager, Screen
+import re, random, string
 try:
     from bs4 import BeautifulSoup
 
@@ -25,7 +37,7 @@ except ImportError:
 
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
-    font_size_ratio = NumericProperty(0.95)  # Adjust this ratio as needed
+    font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -56,13 +68,12 @@ class MyWidget(Widget):
             Color(0.1, 0.1, 0.1, 1)  # Dark gray background color
             self.rect = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self.update_rect, pos=self.update_rect)
-        
 
     def update_rect(self, *args):
         self.rect.size = (Window.width, Window.height / 9)
         self.rect.pos = (0, 0)
 
-class MyApp(App):
+class MainAppScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.scripture="Search to choose your piece of scripture"
@@ -92,6 +103,16 @@ class MyApp(App):
             "163": "¹⁶³", "164": "¹⁶⁴", "165": "¹⁶⁵", "166": "¹⁶⁶", "167": "¹⁶⁷", "168": "¹⁶⁸", "169": "¹⁶⁹", "170": "¹⁷⁰", "171": "¹⁷¹", 
             "172": "¹⁷²", "173": "¹⁷³", "174": "¹⁷⁴", "175": "¹⁷⁵", "176": "¹⁷⁶"
         }
+        print("In Main Screen")
+        self.build()
+
+    def go_to_fill_in_the_blank(self, instance):
+        # Set the scripture before switching to FillInTheBlankScreen
+        fill_in_blank_screen = self.manager.get_screen('fill_in_the_blank')
+        fill_in_blank_screen.set_verse(self.scripture)  # Passing the scripture
+
+        # Switch to FillInTheBlankScreen
+        self.manager.current = 'fill_in_the_blank'
 
     def read_verse_by_sentence(self):
         self.clear_page_content()
@@ -136,7 +157,7 @@ class MyApp(App):
             text="Back",
             font_size='14sp',
             size_hint=(None, None),
-            size=(300, 140),  # Set the button size
+            size=(100, 40),  # Set the button size
             pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
         )
         back_button.bind(on_press=lambda instance: self.call_start_no_exceptions(instance))  
@@ -168,17 +189,17 @@ class MyApp(App):
             y=70
         )
         with left_rectangle.canvas:
-            Color(1, 0, 0, .7)  # Red color
+            Color(1, 0, 0, 0)  # Red color
             self.rect_left = Rectangle(size=left_rectangle.size, pos=left_rectangle.pos)
 
         # Add a touchable blue rectangle on the right half
         right_rectangle = Widget(
             size_hint=(None, None),
             size=(Window.width * 0.5, Window.height),  # Occupy the right half
-            pos=(520, 70)  # Positioned at the top right corner
+            pos=(600, 70)  # Positioned at the top right corner
         )
         with right_rectangle.canvas:
-            Color(0, 0, 1, .7)  # Blue color
+            Color(0, 0, 1, 0)  # Blue color
             self.rect_right = Rectangle(size=right_rectangle.size, pos=right_rectangle.pos)
 
         # Add both rectangles to the layout
@@ -206,9 +227,6 @@ class MyApp(App):
 
         self.layout.bind(on_touch_down=navigate_sentences)
 
-
-
-
     def show_error_popup(self, error_message):
         # Create a simple popup to display the error message
         content = Button(text="OK", size_hint=(None, None), size=(200, 100))
@@ -235,9 +253,9 @@ class MyApp(App):
         self.layout.add_widget(MyWidget())
 
         # Create icons
-        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.1, 0.1), pos_hint={'center_x': 0.5, 'y': 0.01})
-        self.start_icon = Image(source='startIco-d.png', size_hint=(0.1, 0.1), pos_hint={'center_x': 0.25, 'y': 0.01})
-        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.1, 0.1), pos_hint={'center_x': 0.75, 'y': 0.01})
+        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.5, 'y': 0.01})
+        self.start_icon = Image(source='startIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.25, 'y': 0.01})
+        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.75, 'y': 0.01})
 
         # Add icons to layout
         self.layout.add_widget(self.home_icon)
@@ -254,7 +272,7 @@ class MyApp(App):
         self.layout.add_widget(self.page_label)
         self.current_page_content.append(self.page_label)
 
-        return self.layout
+        self.add_widget(self.layout)
 
     def clear_page_content(self):
         for widget in self.current_page_content:
@@ -331,7 +349,7 @@ class MyApp(App):
         # Bind the button to the empty function
         read.bind(on_touch_down=lambda instance, touch: self.read_verse_by_sentence() if instance.collide_point(touch.x, touch.y) else None)
         speech.bind(on_press=self.empty_function)
-        fill_blanks.bind(on_press=self.empty_function)
+        fill_blanks.bind(on_release=self.go_to_fill_in_the_blank)
         audio.bind(on_press=self.empty_function)
         back.bind(on_touch_down=self.overlay_button_back_pressed)
 
@@ -508,7 +526,7 @@ class MyApp(App):
                 foreground_color=(0, 0, 0, 1),
                 padding=(dp(10), dp(10)),
                 cursor_color=(0, 0, 0, 1),
-                cursor_width=1,
+                cursor_width=3,
                 font_size=sp(25)  # Use sp for font size to ensure it scales with DPI
             )
 
@@ -533,7 +551,7 @@ class MyApp(App):
             version_labels = [
                 {"text": "ESV", "pos_y": 0.92},
                 {"text": "NKJV", "pos_y": 0.79},
-                {"text": "NLT", "pos_y": 0.66},
+                {"text": "MSG", "pos_y": 0.66},
                 {"text": "RV09", "pos_y": 0.53},
                 {"text": "Select", "pos_y": 0.27},  # Submit button
             ]
@@ -567,7 +585,7 @@ class MyApp(App):
             for version in version_labels:
                 version_label = ClickableLabel(
                     text=version["text"],
-                    size_hint=(0.065, 0.065),
+                    size_hint=(0.055, 0.055),
                     pos_hint={'center_x': 0.5, 'center_y': version["pos_y"]},
                     font_name='impact.ttf',
                     color=(1, 1, 1, 0.6)  # Default color
@@ -653,6 +671,202 @@ class MyApp(App):
         resultStr = re.sub(r"(\d+): ", lambda match: self.superscript_dict.get(match.group(1), match.group(1) + ": "), resultStr)
         return resultStr
         
+# ---------------------------------------------------------------------------------------------------------
+
+class FillInTheBlankScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.scripture = ""  # Placeholder for scripture
+        self.layout = FloatLayout()  # Use FloatLayout to enable pos_hint functionality
+        self.current_index = 0  # Initialize sentence index
+        self.sentences = []  # Will store sentences after splitting the scripture
+        self.selected_level = {}  # Initialize selected_level here
+        self.initialize_levels()  # Initialize the difficulty levels when screen is created
+        print("Screen initialized.")  # Debugging to confirm initialization
+        self.add_widget(self.layout)  # Add layout to the screen once during initialization
+
+    def set_verse(self, verse):
+        """Set the scripture passed from MainAppScreen."""
+        self.scripture = verse
+        print(f"Verse received: {self.scripture}")  # Debugging to check if the verse is passed
+        
+        # Split the verse into sentences and update layout after receiving the verse
+        self.sentences = self.split_into_sentences(self.scripture)  
+        print(f"Sentences: {self.sentences}")  # Debugging to check if the sentences are split correctly
+        
+        # After setting the verse, now update the layout
+        self.update_sentence_layout()  # Ensure the layout is updated after the verse is set
+
+    def initialize_levels(self):
+        """Initialize the difficulty levels (easy, medium, hard)."""
+        easy_factor = 0.3
+        medium_factor = 0.45
+        hard_factor = 0.85
+
+        # Function to calculate the number of blanks based on the difficulty and word count
+        def calculate_blanks(word_count, difficulty_factor):
+            return max(1, int(word_count * difficulty_factor))
+
+        # Example for sentences with varying word counts
+        self.lvl_easy = {i: calculate_blanks(i, easy_factor) for i in range(2, 58)}
+        self.lvl_medium = {i: calculate_blanks(i, medium_factor) for i in range(2, 58)}
+        self.lvl_hard = {i: calculate_blanks(i, hard_factor) for i in range(2, 58)}
+        
+        self.selected_level = self.lvl_easy  # Default level is set to easy
+
+    def update_sentence_layout(self):
+        """Updates the layout with the current sentence, replacing random words with blanks."""
+        print("Updating sentence layout...")  # Debugging to confirm that the layout is being updated
+        self.layout.clear_widgets()  # Clear previous widgets
+        self.user_inputs = []  # List to store TextInput widgets for comparison
+        self.correct_words = []  # List to store the correct words for blanks
+
+        if not self.sentences:  # If no sentences are available, display a fallback message
+            self.sentences = ["No scripture chosen."]
+        
+        # Get the current sentence to display
+        self.current_sentence = self.sentences[self.current_index]
+        words = self.current_sentence.split()
+        self.blank_count = self.selected_level.get(len(words), 1)  # Get the blank count based on the word count
+
+        print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
+
+        # Randomly select indices for blanks
+        blank_indices = random.sample(range(len(words)), self.blank_count)
+
+        # Create a grid layout for the sentence with blanks
+        sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=40, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
+
+        for i, word in enumerate(words):
+            if i in blank_indices:
+                # Replace the word with a TextInput (blank)
+                blank = TextInput(
+                    multiline=False,
+                    size_hint=(None, None),
+                    size=(100, 40),  # Fixed size for blanks
+                    background_color=(1, 1, 1, 0.05),
+                    cursor_width=3,
+                    foreground_color=(1, 1, 1, 1),
+                    halign="center",
+                    font_size=sp(18)
+                )
+                blank.bind(on_text_validate=self.next_empty_entry)  # Bind Enter key event
+                sentence_layout.add_widget(blank)
+                self.user_inputs.append(blank)  # Store the TextInput widget in the list
+                self.correct_words.append(word)  # Store the correct word for this blank
+            else:
+                self.wrap_width = 150  # Define the maximum width for wrapping text
+                # Add the word as a label
+                label = Label(
+                    text=word,
+                    size_hint=(None, None),
+                    size=(self.wrap_width, 40),  # Dynamically size based on word length
+                    halign="center",
+                    valign="middle",
+                    font_size=sp(18)
+                )
+                label.bind(size=label.setter('text_size'))  # Ensure text fits inside label
+                sentence_layout.add_widget(label)
+
+        self.layout.add_widget(sentence_layout)
+
+        # Add a submit button at the bottom of the layout
+        submit_button = Button(
+            text="Submit",
+            size_hint=(0.3, 0.1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.1}
+        )
+        submit_button.bind(on_press=self.submit_answers)
+        self.layout.add_widget(submit_button)
+
+        # Add the "Finish Quiz" button
+        finish_button = Button(
+            text="Finish Quiz",
+            size_hint=(0.12, 0.05),  # Adjust the size
+            pos_hint={'right': 0.95, 'top': 0.98},  # Position at the bottom-right
+            background_color=(0.2, 0.6, 0.2, 1)  # Green background color
+        )
+        finish_button.bind(on_press=self.finish_quiz)  # Bind the button to the finish_quiz function
+        self.layout.add_widget(finish_button)
+
+    def finish_quiz(self, instance):
+        """Handles the action when the 'Finish Quiz' button is pressed."""
+        print("Quiz Finished!")  # For now, just print a message
+        self.manager.current = 'main_app'  # Switch back to MainAppScreen (or handle as needed)
+
+    def split_into_sentences(self, text):
+        """Splits the text into a list of sentences."""
+        return re.split(r'(?<=[.!?]) +', text.strip())
+
+    def clean_text(self, text):
+        """Cleans the text by removing punctuation and trimming whitespaces, ignoring special characters like verse numbers."""
+        text = text.strip().lower()  # Remove leading/trailing spaces and convert to lowercase
+
+        # Remove superscript numbers and other non-alphanumeric characters
+        text = re.sub(r'[\u00B9\u00B2\u00B3\u00B4\u00B5\u00B6\u00B7\u00B8\u00B9\u00BA\u00BB\u00BC\u00BD\u00BE\u00BF\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7\u00C8\u00C9\u00CA\u00CB\u00CC\u00CD\u00CE\u00CF\u00D0\u00D1\u00D2\u00D3\u00D4\u00D5\u00D6\u00D7\u00D8\u00D9\u00DA\u00DB\u00DC\u00DD\u00DE\u00DF\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5\u00E6\u00E7\u00E8\u00E9\u00EA\u00EB\u00EC\u00ED\u00EE\u00EF\u00F0\u00F1\u00F2\u00F3\u00F4\u00F5\u00F6\u00F7\u00F8\u00F9\u00FA\u00FB\u00FC\u00FD\u00FE\u00FF\u2010\u2013\u2014\u2018\u2019\u201C\u201D\u2022\u2026\u2032\u2033\u2034\u2035\u2036\u2037\u2038\u2039\u203A\u203B\u203C\u203D\u203E\u203F\u2040\u2041\u2042\u2043\u2044\u2045\u2046\u2047\u2048\u2049\u204A\u204B\u204C\u204D\u204E\u204F\u2050\u2051\u2052\u2053\u2054\u2055\u2056\u2057\u2058\u2059\u205A\u205B\u205C\u205D\u205E\u205F\u2060\u2061\u2062\u2063\u2064\u2065\u2066\u2067\u2068\u2069\u206A\u206B\u206C\u206D\u206E\u206F\u2070\u2071\u2072\u2073\u2074\u2075\u2076\u2077\u2078\u2079\u207A\u207B\u207C\u207D\u207E\u207F\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089]', '', text)
+        return ''.join([char for char in text if char not in string.punctuation])  # Remove punctuation
+
+    def submit_answers(self, instance):
+        """Submits the answers and checks if correct, then updates the UI."""
+        all_correct = True
+
+        for i, user_input in enumerate(self.user_inputs):
+            cleaned_input = self.clean_text(user_input.text)  # Get text from TextInput field
+            cleaned_correct_word = self.clean_text(self.correct_words[i])
+
+            if cleaned_input == cleaned_correct_word:
+                user_input.background_color = (0, 1, 0, 1)  # Green
+                user_input.disabled = True
+            else:
+                all_correct = False
+
+        if all_correct:
+            self.show_next_button()
+
+    def show_next_button(self):
+        """Displays the Next button when all answers are correct."""
+        next_button = Button(
+            text="Next",
+            size_hint=(0.3, 0.1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.1}
+        )
+        next_button.bind(on_press=self.next_sentence)
+        self.layout.add_widget(next_button)
+
+    def next_sentence(self, instance):
+        """Moves to the next sentence."""
+        self.layout.clear_widgets()  # Clear the previous widgets
+        self.current_index += 1
+        if self.current_index >= len(self.sentences):
+            self.current_index = 0  # Loop back to the first sentence if all sentences are used
+        self.update_sentence_layout()  # Load the next sentence
+
+    def next_empty_entry(self, instance):
+        """Move focus to the next empty entry when Enter is pressed."""
+        for i, user_input in enumerate(self.user_inputs):
+            if not user_input.text.strip():  # If the current TextInput is empty
+                user_input.focus = True
+                break
+
+# --------------------------------------------------------------------------------------------------------
+
+class MyApp(App):
+    def build(self):
+        self.sm = ScreenManager()
+
+        # Add MainAppScreen
+        self.main_app_screen = MainAppScreen(name='main_app')
+        self.sm.add_widget(self.main_app_screen)
+
+        # Add FillInTheBlankScreen
+        self.fill_in_the_blank_screen = FillInTheBlankScreen(name='fill_in_the_blank')
+        self.sm.add_widget(self.fill_in_the_blank_screen)
+
+        self.sm.current = 'main_app'  # or 'fill_in_the_blank' for the other screen
+
+        return self.sm
+
 
 
 if __name__ == '__main__':
