@@ -29,7 +29,6 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import re, random, string
 try:
     from bs4 import BeautifulSoup
-
 except ImportError:
     from subprocess import call
     call(['pip', 'install', 'beautifulsoup4'])
@@ -253,12 +252,13 @@ class MainAppScreen(Screen):
         self.layout.add_widget(MyWidget())
 
         # Create icons
-        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.5, 'y': 0.01})
-        self.start_icon = Image(source='startIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.25, 'y': 0.01})
-        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.75, 'y': 0.01})
+        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.5, 'y': -0.01})
+        self.start_icon = Image(source='startIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.25, 'y': -0.01})
+        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.75, 'y': -0.01})
+
 
         # Add icons to layout
-        self.layout.add_widget(self.home_icon)
+        self.layout.add_widget(self.home_icon) 
         self.layout.add_widget(self.start_icon)
         self.layout.add_widget(self.search_icon)
 
@@ -728,24 +728,27 @@ class FillInTheBlankScreen(Screen):
         self.current_sentence = self.sentences[self.current_index]
         words = self.current_sentence.split()
         self.blank_count = self.selected_level.get(len(words), 1)  # Get the blank count based on the word count
-
+        longest_word_length = max(len(word) for word in words)
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
-
+        word_length_to_size = {8:80, 9:85, 10:90, 11:95, 12:100, 13: 105, 14: 110, 15: 115, 16:120, 17:125, 18:130, 19:130}
         # Randomly select indices for blanks
         blank_indices = random.sample(range(len(words)), self.blank_count)
 
-        # Create a grid layout for the sentence with blanks
-        sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=40, pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
+        self.line_spacing = 60
 
+        # Create a grid layout for the sentence with blanks
+        sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.7, 'center_y': 0.5})
+        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
+ 
         for i, word in enumerate(words):
             if i in blank_indices:
                 # Replace the word with a TextInput (blank)
                 blank = TextInput(
                     multiline=False,
                     size_hint=(None, None),
-                    size=(100, 40),  # Fixed size for blanks
+                    size=(word_length_to_size.get(longest_word_length, 70), 40),  # Fixed size for blanks
                     background_color=(1, 1, 1, 0.05),
+                    font_name = "noto-sans.ttf",
                     cursor_width=3,
                     foreground_color=(1, 1, 1, 1),
                     halign="center",
@@ -763,6 +766,7 @@ class FillInTheBlankScreen(Screen):
                     size_hint=(None, None),
                     size=(self.wrap_width, 40),  # Dynamically size based on word length
                     halign="center",
+                    font_name = "noto-sans.ttf",
                     valign="middle",
                     font_size=sp(18)
                 )
@@ -797,7 +801,30 @@ class FillInTheBlankScreen(Screen):
 
     def split_into_sentences(self, text):
         """Splits the text into a list of sentences."""
-        return re.split(r'(?<=[.!?]) +', text.strip())
+        # Initial split using punctuation (periods, exclamation points, question marks)
+        sentences = re.split(r'(?<=[.!?]) +', text.strip())
+        final_sentences = []
+
+        for sentence in sentences:
+            words = sentence.split()
+            while len(words) > 18:  # Handle sentences longer than 18 words
+                # Check for commas in the next 18 words to split
+                for i in range(12, min(18, len(words))):
+                    if ',' in words[i]:
+                        # Split at the comma and adjust
+                        final_sentences.append(' '.join(words[:i + 1]).strip(','))
+                        words = words[i + 1:]
+                        break
+                else:
+                    # If no comma is found, split at 18 words
+                    final_sentences.append(' '.join(words[:18]))
+                    words = words[18:]
+
+            # Add any remaining words as a sentence
+            if words:
+                final_sentences.append(' '.join(words))
+
+        return final_sentences
 
     def clean_text(self, text):
         """Cleans the text by removing punctuation and trimming whitespaces, ignoring special characters like verse numbers."""
