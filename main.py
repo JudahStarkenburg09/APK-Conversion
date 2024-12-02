@@ -748,7 +748,7 @@ class FillInTheBlankScreen(Screen):
                 blank = TextInput(
                     multiline=False,
                     size_hint=(None, None),
-                    size=(word_length_to_size.get(longest_word_length, 70), 40),  # Fixed size for blanks
+                    size=(word_length_to_size.get(longest_word_length, 70), dp(40)),  # Fixed size for blanks
                     background_color=(1, 1, 1, 0.05),
                     font_name = "cour.ttf",
                     cursor_width=3,
@@ -766,11 +766,11 @@ class FillInTheBlankScreen(Screen):
                 label = Label(
                     text=word,
                     size_hint=(None, None),
-                    size=(self.wrap_width, dp(60)),  # Dynamically size based on word length
+                    size=(self.wrap_width, dp(40)),  # Dynamically size based on word length
                     halign="center",
                     font_name = "cour.ttf",
                     valign="middle",
-                    font_size=sp(18)
+                    font_size=sp(20)
                 )
                 label.bind(size=label.setter('text_size'))  # Ensure text fits inside label
                 sentence_layout.add_widget(label)
