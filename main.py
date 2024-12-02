@@ -252,9 +252,9 @@ class MainAppScreen(Screen):
         self.layout.add_widget(MyWidget())
 
         # Create icons
-        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.5, 'y': -0.01})
-        self.start_icon = Image(source='startIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.25, 'y': -0.01})
-        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.13, 0.13), pos_hint={'center_x': 0.75, 'y': -0.01})
+        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.5, 'y': -0.01})
+        self.start_icon = Image(source='startIco-d.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.2, 'y': -0.01})
+        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.8, 'y': -0.01})
 
 
         # Add icons to layout
@@ -730,63 +730,58 @@ class FillInTheBlankScreen(Screen):
         self.blank_count = self.selected_level.get(len(words), 1)  # Get the blank count based on the word count
         longest_word_length = max(len(word) for word in words)
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
-        word_length_to_size = {8: 80, 9: 85, 10: 90, 11: 95, 12: 100, 13: 105, 14: 110, 15: 115, 16: 120, 17: 125, 18: 130, 19: 130}
+        word_length_to_size = {8:80, 9:85, 10:90, 11:95, 12:100, 13: 105, 14: 110, 15: 115, 16:120, 17:125, 18:130, 19:130}
+        for i, key in enumerate(word_length_to_size):
+            word_length_to_size[key] -= 5
         # Randomly select indices for blanks
         blank_indices = random.sample(range(len(words)), self.blank_count)
 
-        self.line_spacing = 60  # Increased line spacing
+        self.line_spacing = dp(60)
 
-        # Create a vertical box layout for the sentence with blanks
-        sentence_layout = BoxLayout(
-            orientation='vertical',
-            size_hint=(0.9, None),
-            height=0,  # Set initial height
-            spacing=self.line_spacing,
-            pos_hint={'center_x': 0.5, 'top': 0.9}  # Align from the top
-        )
-
+        # Create a grid layout for the sentence with blanks
+        sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.6, 'center_y': 0.85})
+        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
+ 
         for i, word in enumerate(words):
             if i in blank_indices:
                 # Replace the word with a TextInput (blank)
                 blank = TextInput(
                     multiline=False,
-                    size=(word_length_to_size.get(longest_word_length, 70), 40),
-                    size_hint=(1, None),
-                    height=50,  # Fixed height for blanks
+                    size_hint=(None, None),
+                    size=(word_length_to_size.get(longest_word_length, 70), 40),  # Fixed size for blanks
                     background_color=(1, 1, 1, 0.05),
-                    font_name="noto-sans.ttf",
+                    font_name = "cour.ttf",
                     cursor_width=3,
                     foreground_color=(1, 1, 1, 1),
                     halign="center",
-                    font_size=sp(18)  # Increased font size
+                    font_size=sp(18)
                 )
                 blank.bind(on_text_validate=self.next_empty_entry)  # Bind Enter key event
                 sentence_layout.add_widget(blank)
                 self.user_inputs.append(blank)  # Store the TextInput widget in the list
                 self.correct_words.append(word)  # Store the correct word for this blank
             else:
+                self.wrap_width = 150  # Define the maximum width for wrapping text
                 # Add the word as a label
                 label = Label(
                     text=word,
-                    size_hint=(1, None),
-                    height=50,  # Adjust height dynamically if needed
+                    size_hint=(None, None),
+                    size=(self.wrap_width, 40),  # Dynamically size based on word length
                     halign="center",
+                    font_name = "cour.ttf",
                     valign="middle",
-                    font_name="noto-sans.ttf",
-                    font_size=sp(18)  # Increased font size
+                    font_size=sp(18)
                 )
                 label.bind(size=label.setter('text_size'))  # Ensure text fits inside label
                 sentence_layout.add_widget(label)
 
-        sentence_layout.height = len(words) * (50 + self.line_spacing)  # Adjust height based on content
         self.layout.add_widget(sentence_layout)
 
         # Add a submit button at the bottom of the layout
         submit_button = Button(
             text="Submit",
-            size_hint=(0.4, 0.1),  # Increased size
-            font_size=sp(24),  # Larger font
-            pos_hint={'center_x': 0.5, 'bottom': 0.1}
+            size_hint=(0.3, 0.1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.1}
         )
         submit_button.bind(on_press=self.submit_answers)
         self.layout.add_widget(submit_button)
@@ -794,9 +789,8 @@ class FillInTheBlankScreen(Screen):
         # Add the "Finish Quiz" button
         finish_button = Button(
             text="Finish Quiz",
-            size_hint=(0.2, 0.1),  # Increased size
-            font_size=sp(20),  # Larger font
-            pos_hint={'right': 0.95, 'top': 0.98},  # Position at the top-right
+            size_hint=(0.22, 0.1),  # Adjust the size
+            pos_hint={'right': 0.95, 'top': 0.15},  # Position at the bottom-right
             background_color=(0.2, 0.6, 0.2, 1)  # Green background color
         )
         finish_button.bind(on_press=self.finish_quiz)  # Bind the button to the finish_quiz function
