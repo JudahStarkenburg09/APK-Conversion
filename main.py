@@ -732,7 +732,7 @@ class FillInTheBlankScreen(Screen):
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
         word_length_to_size = {8:dp(80), 9:dp(85), 10:dp(90), 11:dp(95), 12:dp(100), 13: dp(105), 14: dp(110), 15: dp(115), 16:dp(120), 17:dp(125), 18:dp(130), 19:dp(130)}
         for i, key in enumerate(word_length_to_size):
-            word_length_to_size[key] -= 5
+            word_length_to_size[key] -= 0
         # Randomly select indices for blanks
         blank_indices = random.sample(range(len(words)), self.blank_count)
 
@@ -766,7 +766,7 @@ class FillInTheBlankScreen(Screen):
                 label = Label(
                     text=word,
                     size_hint=(None, None),
-                    size=(self.wrap_width, dp(40)),  # Dynamically size based on word length
+                    size=(self.wrap_width, dp(60)),  # Dynamically size based on word length
                     halign="center",
                     font_name = "cour.ttf",
                     valign="middle",
