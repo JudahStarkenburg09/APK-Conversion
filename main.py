@@ -295,7 +295,7 @@ class MainAppScreen(Screen):
     def methods_overlay(self):
         self.methodsTitle = ClickableLabel(
             text="Choose your method",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.056, 0.056),
             pos_hint={'center_x': 0.5, 'center_y': 0.88},
             font_name='impact.ttf',
         )
@@ -305,41 +305,41 @@ class MainAppScreen(Screen):
 
         # Create and add the button
         # Create and add the clickable text labels
-        read = ClickableLabel(
+        read = SmallerClickableLabel(
             text="Read",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.72},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
-        )
+        )   
 
-        speech = ClickableLabel(
+        speech = SmallerClickableLabel(
             text="Speech",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.59},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
-        fill_blanks = ClickableLabel(
+        fill_blanks = SmallerClickableLabel(
             text="Fill Blanks",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.46},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
-        audio = ClickableLabel(
+        audio = SmallerClickableLabel(
             text="Audio",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.33},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
         )
 
-        back = ClickableLabel(
+        back = SmallerClickableLabel(
             text="Back",
-            size_hint=(0.055, 0.055),
+            size_hint=(0.1, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.2},
             font_name='impact.ttf',
             color=(1, 1, 1, 0.8)
@@ -730,7 +730,7 @@ class FillInTheBlankScreen(Screen):
         self.blank_count = self.selected_level.get(len(words), 1)  # Get the blank count based on the word count
         longest_word_length = max(len(word) for word in words)
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
-        word_length_to_size = {8:80, 9:85, 10:90, 11:95, 12:100, 13: 105, 14: 110, 15: 115, 16:120, 17:125, 18:130, 19:130}
+        word_length_to_size = {8:dp(80), 9:dp(85), 10:dp(90), 11:dp(95), 12:dp(100), 13: dp(105), 14: dp(110), 15: dp(115), 16:dp(120), 17:dp(125), 18:dp(130), 19:dp(130)}
         for i, key in enumerate(word_length_to_size):
             word_length_to_size[key] -= 5
         # Randomly select indices for blanks
@@ -766,7 +766,7 @@ class FillInTheBlankScreen(Screen):
                 label = Label(
                     text=word,
                     size_hint=(None, None),
-                    size=(self.wrap_width, 40),  # Dynamically size based on word length
+                    size=(self.wrap_width, dp(40)),  # Dynamically size based on word length
                     halign="center",
                     font_name = "cour.ttf",
                     valign="middle",
