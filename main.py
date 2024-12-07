@@ -34,6 +34,12 @@ except ImportError:
     call(['pip', 'install', 'beautifulsoup4'])
     from bs4 import BeautifulSoup
 
+from kivy.core.window import Window
+
+# Simulate a phone screen size (e.g., 360x640)
+# Window.size = (360, 640)
+
+
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
     font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
@@ -75,6 +81,7 @@ class MyWidget(Widget):
 class MainAppScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        
         self.scripture="Search to choose your piece of scripture"
         self.reference=""
         self.current_sentence_index = 0
@@ -741,7 +748,7 @@ class FillInTheBlankScreen(Screen):
         # Create a grid layout for the sentence with blanks
         sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.6, 'center_y': 0.85})
         sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
- 
+
         for i, word in enumerate(words):
             if i in blank_indices:
                 # Replace the word with a TextInput (blank)
@@ -884,7 +891,7 @@ class FillInTheBlankScreen(Screen):
 class MyApp(App):
     def build(self):
         self.sm = ScreenManager()
-
+        
         # Add MainAppScreen
         self.main_app_screen = MainAppScreen(name='main_app')
         self.sm.add_widget(self.main_app_screen)
