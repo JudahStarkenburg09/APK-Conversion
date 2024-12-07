@@ -458,7 +458,7 @@ class MainAppScreen(Screen):
                 valign='top',
                 color=(1, 1, 1, 1),  # Adjust text color if necessary
             )
-
+            print(self.reference)
             referenceText = ClickableLabel(text=f"{self.reference}",
                     size_hint=(0.0315, 0.0415),
                     color=(1, 1, 1, 1), 
@@ -673,7 +673,7 @@ class MainAppScreen(Screen):
 
     def search_verse(self, reference):
         import get_verse, re
-
+        self.reference = reference[0].upper() + reference[1:]
         resultList, resultStr = get_verse.search_verse(self.version, reference)
         resultStr = re.sub(r"(\d+): ", lambda match: self.superscript_dict.get(match.group(1), match.group(1) + ": "), resultStr)
         return resultStr
