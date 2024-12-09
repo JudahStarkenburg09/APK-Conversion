@@ -186,7 +186,7 @@ class MainAppScreen(Screen):
             color=(1, 1, 1, 0.7),  # Slightly transparent white
             size_hint=(None, None),
             size=(Window.width * 0.3, 30),
-            pos=(540, Window.height - 50),  # Top-right corner
+            pos=(560, Window.height - 50),  # Top-right corner
             halign='right',
             valign='middle'
         )
@@ -198,7 +198,7 @@ class MainAppScreen(Screen):
         back_button = Image(
             source='return.png',  # Set the image source
             size_hint=(0.125, 0.125),
-            pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
+            pos_hint={'center_x': 0.5, 'top': 1.1},  # Centered at the top
         )
 
         # Bind the on_touch_down event to the desired function
@@ -331,11 +331,68 @@ class MainAppScreen(Screen):
 
     def select_home(self, instance, touch, _pass):
         if instance.collide_point(touch.x, touch.y) or _pass:
+            # Clear previous content on the screen
             self.clear_page_content()
+
+            # Update the selected icon (e.g., for the navigation menu)
             self.update_selected_icon(self.home_icon, "Home")
-            self.page_label = Label(text="Home", font_size='20sp', size_hint=(0.8, 0.8), pos_hint={'center_x': 0.5, 'center_y': 0.6})
+            
+            # Add a main title/label to the screen
+            self.page_label = Label(
+                text="Home", 
+                font_size='20sp', 
+                size_hint=(0.8, None), 
+                height=50, 
+                pos_hint={'center_x': 0.5, 'top': 1}
+            )
             self.layout.add_widget(self.page_label)
             self.current_page_content.append(self.page_label)
+            
+            # Add a welcome message or introduction
+            welcome_label = Label(
+                text="Welcome to the Bible App!", 
+                font_size=sp(24), 
+                size_hint=(0.8, None), 
+                height=50, 
+                pos_hint={'center_x': 0.5, 'center_y': 0.75}
+            )
+            self.layout.add_widget(welcome_label)
+            self.current_page_content.append(welcome_label)
+            
+            # Add the theme verse encouraging scripture memorization
+            theme_verse = Label(
+                text="""I have hidden Your word in my heart that I might not sin against You.\nPsalm 119:11""",
+                font_size=sp(16), 
+                size_hint=(0.8, None), 
+                height=100, 
+                halign='center',  # This centers the text horizontally
+                valign='middle',  # This centers the text vertically (useful if multiple lines)
+                pos_hint={'center_x': 0.5, 'center_y': 0.5}
+            )
+            self.layout.add_widget(theme_verse)
+            self.current_page_content.append(theme_verse)
+            
+            # Add navigation buttons for other screens
+            search_button = Button(
+                text="Search for a Verse", 
+                size_hint=(0.5, None), 
+                height=50, 
+                pos_hint={'center_x': 0.5, 'center_y': 0.3}
+            )
+            search_button.bind(on_release= lambda instance, touch: self.call_search_no_exceptions(instance))
+            self.layout.add_widget(search_button)
+            self.current_page_content.append(search_button)
+            
+            # fill_in_button = Button(
+            #     text="Fill in the Blank", 
+            #     size_hint=(0.5, None), 
+            #     height=50, 
+            #     pos_hint={'center_x': 0.5, 'center_y': 0.2}
+            # )
+            # fill_in_button.bind(on_release=self.go_to_fill_in_the_blank)
+            # self.layout.add_widget(fill_in_button)
+            # self.current_page_content.append(fill_in_button)
+
 
     def methods_overlay(self):
         self.methodsTitle = ClickableLabel(
@@ -451,6 +508,10 @@ class MainAppScreen(Screen):
     def call_start_no_exceptions(self, instance):
         # Call select_start with _pass set to True
         self.select_start(instance=instance, touch=None, _pass=True)
+
+    def call_search_no_exceptions(self, instance):
+        # Call select_start with _pass set to True
+        self.select_search(instance=instance, touch=None, _pass=True)
 
     def select_start(self, instance, touch, _pass):
         window_width = Window.width
