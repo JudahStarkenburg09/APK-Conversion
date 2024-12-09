@@ -478,24 +478,24 @@ class MainAppScreen(Screen):
             )
             print(self.reference)
             referenceText = ClickableLabel(text=f"{self.reference}",
-                    size_hint=(0.047, 0.047),
+                    size_hint=(0.05, 0.05),
                     halign='left',       # Align text to the left
                     color=(1, 1, 1, 1), 
                     font_name="impact.ttf",
-                    pos_hint={'center_x': 0.25, 'center_y': 0.875})
+                    pos_hint={'center_x': 0.35, 'center_y': 0.875})
             
             versionText = ClickableLabel(text=f"{self.version}",
-                    size_hint=(0.046, 0.046),
+                    size_hint=(0.05, 0.05),
                     halign='left',       # Align text to the left
                     color=(1, 1, 1, 1), 
                     font_name="impact.ttf",
-                    pos_hint={'center_x': 0.25, 'center_y': 0.8})
+                    pos_hint={'center_x': 0.35, 'center_y': 0.8})
 
             # Replace the Memorize button and text with an image
             memorize_image = Image(
                 source='memorize.png',
                 size_hint=(0.2, 0.2),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.55, 'center_y': 0.825}  # Position relative to the parent center
+                pos_hint={'center_x': 0.8, 'center_y': 0.925}  # Position relative to the parent center
             )
 
             # Bind the image to the overlay button function
