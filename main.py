@@ -37,7 +37,7 @@ except ImportError:
 from kivy.core.window import Window
 
 # Simulate a phone screen size (e.g., 360x640)
-# Window.size = (360, 640)
+Window.size = (360, 640)
 
 from kivy.storage.jsonstore import JsonStore
 
@@ -355,7 +355,7 @@ class MainAppScreen(Screen):
             homebg = Image(
                 source='home-top-bg.png',
                 size_hint=(1, 1),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.5, 'center_y': 0.8}  # Position relative to the parent center
+                pos_hint={'center_x': 0.5, 'center_y': 0.85}  # Position relative to the parent center
             )
             
             self.layout.add_widget(homebg)
@@ -368,7 +368,7 @@ class MainAppScreen(Screen):
                 size_hint=(0.8, None), 
                 font_name="impact.ttf",
                 height=50, 
-                pos_hint={'center_x': 0.6, 'center_y': 0.92}
+                pos_hint={'center_x': 0.6, 'center_y': 0.935}
             )
             self.layout.add_widget(welcome_label)
             self.current_page_content.append(welcome_label)
@@ -377,7 +377,7 @@ class MainAppScreen(Screen):
             icon = Image(
                 source='echoscriptureicon.png',
                 size_hint=(0.125, 0.125),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.4, 'center_y': 0.92}  # Position relative to the parent center
+                pos_hint={'center_x': 0.25, 'center_y': 0.935}  # Position relative to the parent center
             )
             
             self.layout.add_widget(icon)
@@ -394,7 +394,7 @@ class MainAppScreen(Screen):
                 height=100, 
                 halign='center',  # This centers the text horizontally
                 valign='middle',  # This centers the text vertically (useful if multiple lines)
-                pos_hint={'center_x': 0.5, 'center_y': 0.77}
+                pos_hint={'center_x': 0.5, 'center_y': 0.835}
             )
             self.layout.add_widget(theme_verse)
             self.current_page_content.append(theme_verse)
