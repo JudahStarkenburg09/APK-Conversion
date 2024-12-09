@@ -27,6 +27,9 @@ from kivy.uix.dropdown import DropDown
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 import re, random, string
+import get_verse
+from datetime import datetime
+import re
 try:
     from bs4 import BeautifulSoup
 except ImportError:
@@ -42,7 +45,7 @@ from kivy.core.window import Window
 from kivy.storage.jsonstore import JsonStore
 
 # Create or access a JSON store file
-store = JsonStore('mydata.json')
+store = JsonStore('verse_history.json')
 
 
 def format_reference(reference):
@@ -350,75 +353,141 @@ class MainAppScreen(Screen):
             # Update the selected icon (e.g., for the navigation menu)
             self.update_selected_icon(self.home_icon, "Home")
 
-
-            # Replace the Memorize button and text with an image
+            # Add background image
             homebg = Image(
                 source='home-top-bg.png',
-                size_hint=(1, 1),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.5, 'center_y': 0.85}  # Position relative to the parent center
+                size_hint=(1.1, 1.1),
+                pos_hint={'center_x': 0.5, 'center_y': 0.85}
             )
-            
             self.layout.add_widget(homebg)
             self.current_page_content.append(homebg)
-            
-            # Add a welcome message or introduction
+
+            # Add welcome label
             welcome_label = Label(
-                text="Echo Scripture", 
-                font_size=sp(30), 
-                size_hint=(0.8, None), 
+                text="Echo Scripture",
+                font_size=sp(30),
+                size_hint=(0.8, None),
                 font_name="impact.ttf",
-                height=50, 
+                height=50,
                 pos_hint={'center_x': 0.6, 'center_y': 0.935}
             )
             self.layout.add_widget(welcome_label)
             self.current_page_content.append(welcome_label)
 
-            # Replace the Memorize button and text with an image
+            # Add icon
             icon = Image(
                 source='echoscriptureicon.png',
-                size_hint=(0.125, 0.125),  # Width and height as a percentage of the parent
-                pos_hint={'center_x': 0.25, 'center_y': 0.935}  # Position relative to the parent center
+                size_hint=(0.125, 0.125),
+                pos_hint={'center_x': 0.25, 'center_y': 0.935}
             )
-            
             self.layout.add_widget(icon)
             self.current_page_content.append(icon)
 
-
-
-            # Add the theme verse encouraging scripture memorization
+            # Add theme verse
             theme_verse = Label(
                 text="""I have hidden Your word in my heart,\nthat I might not sin against You.\nPsalm 119:11""",
-                font_size=sp(16), 
-                size_hint=(0.8, None), 
+                font_size=sp(16),
+                size_hint=(0.8, None),
                 font_name="noto-sans.ttf",
-                height=100, 
-                halign='center',  # This centers the text horizontally
-                valign='middle',  # This centers the text vertically (useful if multiple lines)
+                height=100,
+                halign='center',
+                valign='middle',
                 pos_hint={'center_x': 0.5, 'center_y': 0.835}
             )
             self.layout.add_widget(theme_verse)
             self.current_page_content.append(theme_verse)
+
+            # Add "Recent Searches" header
+            recent_label = Label(
+                text="Recent Searches",
+                font_size=sp(26),
+                size_hint=(0.8, None),
+                font_name='noto-sans.ttf',
+                height=40,
+                pos_hint={'center_x': 0.5, 'center_y': 0.7}
+            )
+            self.layout.add_widget(recent_label)
+            self.current_page_content.append(recent_label)
+
+            # Create a BoxLayout to display recent search buttons
+            # Create a BoxLayout to display recent search labels
+            sL = len(store)
+            stLenY = {1: 0.75, 2: 0.675, 3: 0.585, 4: 0.52}
+            recent_box = BoxLayout(
+                orientation='vertical',
+                size_hint=(0.9, None),
+                height=sp(200),
+                pos_hint={'center_x': 0.5, 'center_y': stLenY.get(sL, 0.425)},
+                spacing=0,
+            )
             
-            # # Add navigation buttons for other screens
-            # search_button = Button(
-            #     text="Search for a Verse", 
-            #     size_hint=(0.4, 0.1), 
-            #     height=50, 
-            #     pos_hint={'center_x': 0.5, 'center_y': 0.3}
-            # )
-            # search_button.bind(on_release= lambda instance, touch: self.call_search_no_exceptions(instance))
-            # self.layout.add_widget(search_button)
-            # self.current_page_content.append(search_button)
-            
-            # fill_in_button = Button(
-            #     text="Fill in the Blank", 
-            #     size_hint=(0.5, None), 
-            #     height=50, 
-            #     pos_hint={'center_x': 0.5, 'center_y': 0.2}
-            # )
-            # fill_in_button.bind(on_release=self.go_to_fill_in_the_blank)
-            # self.layout.add_widget(fill_in_button)
-            # self.current_page_content.append(fill_in_button)
+
+            # Function to handle loading recent searches
+            def load_recent_search(reference, version):
+                print(f"Loaded {reference}")
+                self.version = version
+                self.scripture = self.search_verse(reference, storeData=False)
+                self.call_start_no_exceptions(instance)
+
+            # Load recent searches from JsonStore
+            for key in sorted(store.keys(), reverse=True)[:5]:  # Show the 5 most recent searches
+                data = store.get(key)
+                reference = data['reference']
+                version = data['version']
+                date = data['date']
+
+                # Create a BoxLayout to display the reference, version, and date
+                recent_search_box = BoxLayout(
+                    orientation='vertical',  # Stack labels vertically
+                    size_hint_y=None,  # Use fixed height for the box
+                    height=sp(50),  # Adjust this based on your desired label height
+                    spacing=5,  # Adjust spacing between the lines (if necessary)
+                    pos_hint={'center_x': 0.5}  # Center the BoxLayout horizontally
+                )
+
+                # Create the first label (reference and version)
+                first_line = Label(
+                    text=f"{reference} ({version})",
+                    font_size=sp(18),
+                    font_name='noto-sans.ttf',
+                    halign='center',  # Center align the text horizontally
+                    valign='middle',  # Center align the text vertically
+                    size_hint_y=None,  # Prevent resizing based on content
+                    height=sp(18)
+                )
+
+                # Create the second label (date)
+                second_line = Label(
+                    text=f"{date}",
+                    font_size=sp(12),
+                    font_name='noto-sans.ttf',
+                    halign='center',  # Center align the text horizontally
+                    valign='middle',  # Center align the text vertically
+                    size_hint_y=None,  # Prevent resizing based on content
+                    height=sp(12)
+
+                )
+
+                # Add both labels to the BoxLayout
+                recent_search_box.add_widget(first_line)
+                recent_search_box.add_widget(second_line)
+
+                # Add the recent search box to the layout
+                recent_box.add_widget(recent_search_box)
+
+                # Define the touch handler to detect taps on the label
+                def on_label_touch(instance, touch):
+                    if instance.collide_point(touch.x, touch.y):
+                        load_recent_search(reference, version)
+
+                # Bind the touch handler to the label
+                recent_search_box.bind(on_touch_down=on_label_touch)
+
+
+            # Add the recent search labels to the layout
+            self.layout.add_widget(recent_box)
+            self.current_page_content.append(recent_box)
+   
 
 
     def methods_overlay(self):
@@ -802,15 +871,29 @@ class MainAppScreen(Screen):
         # Empty function for the button
         print("Empty Function")
 
-    def search_verse(self, reference):
-        import get_verse, re
+    def search_verse(self, reference, storeData=True):
 
         self.reference = format_reference(reference)
 
+        # Get the verse result
         resultList, resultStr = get_verse.search_verse(self.version, reference)
         resultStr = re.sub(r"(\d+): ", lambda match: self.superscript_dict.get(match.group(1), match.group(1) + ": "), resultStr)
+
+        if storeData:
+            # Prepare the data to save
+            data_to_save = {
+                'reference': self.reference,
+                'version': self.version,
+                'result': resultStr,
+                'date': datetime.now().strftime("%Y-%m-%d %I:%M %p")  # 12-hour format, no seconds, AM/PM
+            }
+
+            # Save to the store with a unique key (you can use the current timestamp)
+            unique_key = datetime.now().strftime("%Y%m%d%H%M%S")
+            store.put(unique_key, **data_to_save)
+
         return resultStr
-        
+
 # ---------------------------------------------------------------------------------------------------------
 
 class FillInTheBlankScreen(Screen):
