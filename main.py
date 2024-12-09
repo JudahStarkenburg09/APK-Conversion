@@ -40,6 +40,24 @@ from kivy.core.window import Window
 # Window.size = (360, 640)
 
 
+def format_reference(reference):
+    parts = reference.split(" ", 1)  # Split into the first word and the rest
+    if len(parts) == 2 and parts[0][0].isdigit():
+        # Handle references starting with a number
+        first_part = parts[0]
+        rest = parts[1]
+    else:
+        # Handle references without leading numbers
+        first_part = ""
+        rest = reference
+
+    # Capitalize each word in the rest of the reference
+    formatted_rest = " ".join(word.capitalize() for word in rest.split())
+
+    # Combine the parts back together
+    return f"{first_part} {formatted_rest}".strip()
+
+
 class ClickableLabel(ButtonBehavior, Label):
     # Add a property for font size
     font_size_ratio = NumericProperty(1)  # Adjust this ratio as needed
@@ -460,34 +478,47 @@ class MainAppScreen(Screen):
             )
             print(self.reference)
             referenceText = ClickableLabel(text=f"{self.reference}",
-                    size_hint=(0.0315, 0.0415),
+                    size_hint=(0.0615, 0.0615),
+                    halign='left',       # Align text to the left
                     color=(1, 1, 1, 1), 
-                    pos_hint={'center_x': 0.275, 'center_y': 0.8})
-
-
-            memorize_button = Image(source='button1-d.png',
-                    size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.25, 'center_y': 0.925})  # Position relative to parent center
-
-            # Bind the overlay button to the new function
-            memorize_button.bind(on_touch_down=self.overlay_button_pressed)
-
-            memorize_text = SmallerClickableLabel(text="Memorize",
-                                size_hint=(0.0325, 0.0425),
-                                color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.25, 'center_y': 0.925})
+                    font_name="impact.ttf",
+                    pos_hint={'center_x': 0.25, 'center_y': 0.9})
             
-            re_search_button = Image(source='button1-d.png',
-                    size_hint=(0.35, 0.125),  # Width and height as a percentage of the parent
-                    pos_hint={'center_x': 0.75, 'center_y': 0.925})  # Position relative to parent center
+            versionText = ClickableLabel(text=f"{self.version}",
+                    size_hint=(0.05, 0.05),
+                    halign='left',       # Align text to the left
+                    color=(1, 1, 1, 1), 
+                    font_name="impact.ttf",
+                    pos_hint={'center_x': 0.25, 'center_y': 0.8})
 
-            # Bind the overlay button to the new function
-            re_search_button.bind(on_touch_down=lambda instance, touch: self.call_search(instance, touch))
+            # Replace the Memorize button and text with an image
+            memorize_image = Image(
+                source='memorize.png',
+                size_hint=(0.16, 0.16),  # Width and height as a percentage of the parent
+                pos_hint={'center_x': 0.65, 'center_y': 0.875}  # Position relative to the parent center
+            )
 
-            re_search_text = SmallerClickableLabel(text="New Verse",
-                                size_hint=(0.0325, 0.0425),
-                                color=(0, 0, 0, 1),
-                                pos_hint={'center_x': 0.75, 'center_y': 0.925})
+            # Bind the image to the overlay button function
+            memorize_image.bind(on_touch_down=self.overlay_button_pressed)
+
+            # Replace the Re-Search button and text with an image
+            re_search_image = Image(
+                source='new-verse.png',
+                size_hint=(0.16, 0.16),  # Width and height as a percentage of the parent
+                pos_hint={'center_x': 0.85, 'center_y': 0.875}  # Position relative to the parent center
+            )
+
+            # Bind the image to the search function
+            re_search_image.bind(on_touch_down=lambda instance, touch: self.call_search(instance, touch))
+
+            # Add the new images to the layout
+            self.layout.add_widget(memorize_image)
+            self.layout.add_widget(re_search_image)
+
+            # Track the images in current page content
+            self.current_page_content.append(memorize_image)
+            self.current_page_content.append(re_search_image)
+
             
             # Schedule the height adjustment to happen after the label is rendered
             def update_height(*args):
@@ -501,20 +532,12 @@ class MainAppScreen(Screen):
             # Add the label to the scrollview
             scroll_view.add_widget(verse_label)
 
-            memorize_text.bind(on_touch_down=self.overlay_button_pressed)
-
-            self.layout.add_widget(memorize_button)
+            self.layout.add_widget(versionText)
             self.layout.add_widget(referenceText)
-            self.layout.add_widget(re_search_button)
             self.layout.add_widget(scroll_view)
-            self.layout.add_widget(memorize_text)
-            self.layout.add_widget(re_search_text)
+            self.current_page_content.append(versionText)
             self.current_page_content.append(scroll_view)
             self.current_page_content.append(referenceText)
-            self.current_page_content.append(memorize_text)
-            self.current_page_content.append(re_search_text)
-            self.current_page_content.append(memorize_button)
-            self.current_page_content.append(re_search_button)
 
     def select_search(self, instance, touch, _pass):
         window_width = Window.width
@@ -673,7 +696,9 @@ class MainAppScreen(Screen):
 
     def search_verse(self, reference):
         import get_verse, re
-        self.reference = reference[0].upper() + reference[1:]
+
+        self.reference = format_reference(reference)
+
         resultList, resultStr = get_verse.search_verse(self.version, reference)
         resultStr = re.sub(r"(\d+): ", lambda match: self.superscript_dict.get(match.group(1), match.group(1) + ": "), resultStr)
         return resultStr
@@ -739,14 +764,14 @@ class FillInTheBlankScreen(Screen):
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
         word_length_to_size = {8:dp(80), 9:dp(85), 10:dp(90), 11:dp(95), 12:dp(100), 13: dp(105), 14: dp(110), 15: dp(115), 16:dp(120), 17:dp(125), 18:dp(130), 19:dp(130)}
         for i, key in enumerate(word_length_to_size):
-            word_length_to_size[key] -= 0
+            word_length_to_size[key] +=5
         # Randomly select indices for blanks
         blank_indices = random.sample(range(len(words)), self.blank_count)
 
         self.line_spacing = dp(60)
 
         # Create a grid layout for the sentence with blanks
-        sentence_layout = GridLayout(cols=4, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.6, 'center_y': 0.85})
+        sentence_layout = GridLayout(cols=3, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.6, 'center_y': 0.85})
         sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
 
         for i, word in enumerate(words):
