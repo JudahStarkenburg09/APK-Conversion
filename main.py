@@ -194,15 +194,17 @@ class MainAppScreen(Screen):
         self.layout.add_widget(next_label)
         self.current_page_content.append(next_label)
 
-        # Add the back button
-        back_button = Button(
-            text="Back",
-            font_size=sp(30),
-            font_name="impact.ttf",
-            size_hint=(0.15, 0.1),
+        # Add the back button as an image
+        back_button = Image(
+            source='return.png',  # Set the image source
+            size_hint=(0.125, 0.125),
             pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
         )
-        back_button.bind(on_press=lambda instance: self.call_start_no_exceptions(instance))  
+
+        # Bind the on_touch_down event to the desired function
+        back_button.bind(on_touch_down=lambda instance, touch: self.call_start_no_exceptions(instance))
+
+        # Add the image to the layout
         self.layout.add_widget(back_button)
         self.current_page_content.append(back_button)
 
