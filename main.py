@@ -39,6 +39,11 @@ from kivy.core.window import Window
 # Simulate a phone screen size (e.g., 360x640)
 # Window.size = (360, 640)
 
+from kivy.storage.jsonstore import JsonStore
+
+# Create or access a JSON store file
+store = JsonStore('mydata.json')
+
 
 def format_reference(reference):
     parts = reference.split(" ", 1)  # Split into the first word and the rest
@@ -129,6 +134,14 @@ class MainAppScreen(Screen):
         }
         print("In Main Screen")
         self.build()
+
+    def update_variable(self, instance):
+        # Increment the variable value
+        self.variable += 1
+        instance.text = f'Value: {self.variable}'
+        
+        # Save the updated variable to the store
+        store.put('my_variable', value=self.variable)
 
     def go_to_fill_in_the_blank(self, instance):
         # Set the scripture before switching to FillInTheBlankScreen
@@ -297,9 +310,9 @@ class MainAppScreen(Screen):
         self.layout.add_widget(MyWidget())
 
         # Create icons
-        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.5, 'y': -0.01})
-        self.start_icon = Image(source='startIco-d.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.2, 'y': -0.01})
-        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.15, 0.15), pos_hint={'center_x': 0.8, 'y': -0.01})
+        self.home_icon = Image(source='homeIco-s.png', size_hint=(0.2, 0.2), pos_hint={'center_x': 0.5, 'y': -0.03})
+        self.start_icon = Image(source='startIco-d.png', size_hint=(0.2, 0.2), pos_hint={'center_x': 0.2, 'y': -0.03})
+        self.search_icon = Image(source='searchIco-d.png', size_hint=(0.2, 0.2), pos_hint={'center_x': 0.8, 'y': -0.03})
 
 
         # Add icons to layout
@@ -312,10 +325,7 @@ class MainAppScreen(Screen):
         self.start_icon.bind(on_touch_down=lambda instance, touch: self.select_start(instance, touch, _pass=False))
         self.search_icon.bind(on_touch_down=lambda instance, touch: self.select_search(instance, touch, _pass=False))
 
-        # Initial label for content display
-        self.page_label = Label(text="Home", font_size='20sp', size_hint=(0.8, 0.8), pos_hint={'center_x': 0.5, 'center_y': 0.6})
-        self.layout.add_widget(self.page_label)
-        self.current_page_content.append(self.page_label)
+        self.call_home()
 
         self.add_widget(self.layout)
 
@@ -329,59 +339,76 @@ class MainAppScreen(Screen):
             self.layout.canvas.before.remove(self.rect)
             self.rect = None
 
+    def call_home(self):
+        self.select_home(instance=False, touch=False, _pass=True)
+
     def select_home(self, instance, touch, _pass):
-        if instance.collide_point(touch.x, touch.y) or _pass:
+        if _pass or (instance.collide_point(touch.x, touch.y)):
             # Clear previous content on the screen
             self.clear_page_content()
 
             # Update the selected icon (e.g., for the navigation menu)
             self.update_selected_icon(self.home_icon, "Home")
-            
-            # Add a main title/label to the screen
-            self.page_label = Label(
-                text="Home", 
-                font_size='20sp', 
-                size_hint=(0.8, None), 
-                height=50, 
-                pos_hint={'center_x': 0.5, 'top': 1}
+
+
+            # Replace the Memorize button and text with an image
+            homebg = Image(
+                source='home-top-bg.png',
+                size_hint=(1, 1),  # Width and height as a percentage of the parent
+                pos_hint={'center_x': 0.5, 'center_y': 0.8}  # Position relative to the parent center
             )
-            self.layout.add_widget(self.page_label)
-            self.current_page_content.append(self.page_label)
+            
+            self.layout.add_widget(homebg)
+            self.current_page_content.append(homebg)
             
             # Add a welcome message or introduction
             welcome_label = Label(
-                text="Welcome to the Bible App!", 
-                font_size=sp(24), 
+                text="Echo Scripture", 
+                font_size=sp(30), 
                 size_hint=(0.8, None), 
+                font_name="impact.ttf",
                 height=50, 
-                pos_hint={'center_x': 0.5, 'center_y': 0.75}
+                pos_hint={'center_x': 0.6, 'center_y': 0.92}
             )
             self.layout.add_widget(welcome_label)
             self.current_page_content.append(welcome_label)
+
+            # Replace the Memorize button and text with an image
+            icon = Image(
+                source='echoscriptureicon.png',
+                size_hint=(0.125, 0.125),  # Width and height as a percentage of the parent
+                pos_hint={'center_x': 0.4, 'center_y': 0.92}  # Position relative to the parent center
+            )
             
+            self.layout.add_widget(icon)
+            self.current_page_content.append(icon)
+
+
+
             # Add the theme verse encouraging scripture memorization
             theme_verse = Label(
-                text="""I have hidden Your word in my heart that I might not sin against You.\nPsalm 119:11""",
+                text="""I have hidden Your word in my heart,\nthat I might not sin against You.\nPsalm 119:11""",
                 font_size=sp(16), 
                 size_hint=(0.8, None), 
+                font_name="noto-sans.ttf",
                 height=100, 
                 halign='center',  # This centers the text horizontally
                 valign='middle',  # This centers the text vertically (useful if multiple lines)
-                pos_hint={'center_x': 0.5, 'center_y': 0.5}
+                pos_hint={'center_x': 0.5, 'center_y': 0.77}
             )
             self.layout.add_widget(theme_verse)
             self.current_page_content.append(theme_verse)
             
-            # Add navigation buttons for other screens
-            search_button = Button(
-                text="Search for a Verse", 
-                size_hint=(0.5, None), 
-                height=50, 
-                pos_hint={'center_x': 0.5, 'center_y': 0.3}
-            )
-            search_button.bind(on_release= lambda instance, touch: self.call_search_no_exceptions(instance))
-            self.layout.add_widget(search_button)
-            self.current_page_content.append(search_button)
+            # # Add navigation buttons for other screens
+            # search_button = Button(
+            #     text="Search for a Verse", 
+            #     size_hint=(0.4, 0.1), 
+            #     height=50, 
+            #     pos_hint={'center_x': 0.5, 'center_y': 0.3}
+            # )
+            # search_button.bind(on_release= lambda instance, touch: self.call_search_no_exceptions(instance))
+            # self.layout.add_widget(search_button)
+            # self.current_page_content.append(search_button)
             
             # fill_in_button = Button(
             #     text="Fill in the Blank", 
