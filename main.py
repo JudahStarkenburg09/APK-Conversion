@@ -138,12 +138,30 @@ class MainAppScreen(Screen):
         # Switch to FillInTheBlankScreen
         self.manager.current = 'fill_in_the_blank'
 
+    def split_and_combine(self, scripture):
+        # Split by comma, period, question mark, or exclamation mark
+        sentences = re.split(r'[.,?!]', scripture)
+        
+        # Iterate over the sentences and combine single-word sentences with the next one
+        combined_sentences = []
+        i = 0
+        while i < len(sentences):
+            # If the current sentence is a single word and it's not the last one, combine it with the next sentence
+            if len(sentences[i].strip()) > 0 and i + 1 < len(sentences) and len(sentences[i+1].strip()) > 0:
+                combined_sentences.append(sentences[i].strip() + ' ' + sentences[i+1].strip())
+                i += 2  # Skip the next sentence since it's already combined
+            else:
+                combined_sentences.append(sentences[i].strip())
+                i += 1
+
+        return combined_sentences
+
     def read_verse_by_sentence(self):
         self.clear_page_content()
         self.update_selected_icon(self.start_icon, "Read Mode")
 
         # Split the scripture into sentences
-        sentences = re.split(r'\.\s|"(?=\s|$)', self.scripture)
+        sentences = self.split_and_combine(self.scripture)
         self.current_sentence_index = 0
 
         # Add the "Previous" label
@@ -179,9 +197,9 @@ class MainAppScreen(Screen):
         # Add the back button
         back_button = Button(
             text="Back",
-            font_size='14sp',
-            size_hint=(None, None),
-            size=(100, 40),  # Set the button size
+            font_size=sp(30),
+            font_name="impact.ttf",
+            size_hint=(0.15, 0.1),
             pos_hint={'center_x': 0.5, 'top': 1},  # Centered at the top
         )
         back_button.bind(on_press=lambda instance: self.call_start_no_exceptions(instance))  
@@ -191,7 +209,7 @@ class MainAppScreen(Screen):
         # Display the first sentence
         self.sentence_label2 = Label(
             text=re.sub(r'\n', '', sentences[self.current_sentence_index]),
-            font_size='18sp',
+            font_size=sp(26),
             font_name='noto-sans.ttf',
             size_hint=(1, None),  # Make sure height adjusts to content
             height=Window.height * 0.2,  # Adjust this to give enough space
@@ -478,18 +496,18 @@ class MainAppScreen(Screen):
             )
             print(self.reference)
             referenceText = ClickableLabel(text=f"{self.reference}",
-                    size_hint=(0.07, 0.1),
+                    size_hint=(0.07, 0.07),
                     halign='left',       # Align text to the left
                     color=(1, 1, 1, 1), 
                     font_name="impact.ttf",
                     pos_hint={'center_x': 0.5, 'center_y': 0.925})
             
             versionText = ClickableLabel(text=f"{self.version}",
-                    size_hint=(0.12, 0.12),
+                    size_hint=(0.09, 0.09),
                     halign='left',       # Align text to the left
                     color=(1, 1, 1, 1), 
                     font_name="impact.ttf",
-                    pos_hint={'center_x': 0.35, 'center_y': 0.825})
+                    pos_hint={'center_x': 0.325, 'center_y': 0.825})
 
             # Replace the Memorize button and text with an image
             memorize_image = Image(
