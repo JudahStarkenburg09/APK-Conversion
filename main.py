@@ -214,11 +214,11 @@ class MainAppScreen(Screen):
         back_button = Image(
             source='return.png',  # Set the image source
             size_hint=(0.125, 0.125),
-            pos_hint={'center_x': 0.5, 'top': 1.1},  # Centered at the top
+            pos_hint={'center_x': 0.5, 'top': 1.025},  # Centered at the top
         )
 
         # Bind the on_touch_down event to the desired function
-        back_button.bind(on_touch_down=lambda instance, touch: self.call_start_no_exceptions(instance))
+        back_button.bind(on_touch_down=lambda instance, touch: self.call_start_no_exceptions(instance, touch, _pass=False))
 
         # Add the image to the layout
         self.layout.add_widget(back_button)
@@ -427,7 +427,7 @@ class MainAppScreen(Screen):
                 print(f"Loaded {reference}")
                 self.version = version
                 self.scripture = self.search_verse(reference, storeData=False)
-                self.call_start_no_exceptions(instance)
+                self.call_start_no_exceptions(instance, touch=None, _pass=True)
 
             # Load recent searches from JsonStore
             for key in sorted(store.keys(), reverse=True)[:5]:  # Show the 5 most recent searches
@@ -601,9 +601,10 @@ class MainAppScreen(Screen):
 
             self.select_search(instance, touch, True)
 
-    def call_start_no_exceptions(self, instance):
+    def call_start_no_exceptions(self, instance, touch, _pass):
         # Call select_start with _pass set to True
-        self.select_start(instance=instance, touch=None, _pass=True)
+        if _pass or (instance.collide_point(*touch.pos)):
+            self.select_start(instance=instance, touch=None, _pass=True)
 
     def call_search_no_exceptions(self, instance):
         # Call select_start with _pass set to True
