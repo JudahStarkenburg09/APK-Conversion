@@ -40,7 +40,7 @@ except ImportError:
 from kivy.core.window import Window
 
 # Simulate a phone screen size (e.g., 360x640)
-Window.size = (360, 640)
+# Window.size = (360, 640)
 
 from kivy.storage.jsonstore import JsonStore
 
