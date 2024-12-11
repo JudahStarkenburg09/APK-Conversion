@@ -40,7 +40,7 @@ except ImportError:
 from kivy.core.window import Window
 
 # Simulate a phone screen size (e.g., 360x640)
-# Window.size = (360, 640)
+Window.size = (360, 640)
 
 from kivy.storage.jsonstore import JsonStore
 
@@ -955,15 +955,21 @@ class FillInTheBlankScreen(Screen):
         print(f"Words in current sentence: {words}")  # Debugging to check the words in the sentence
         word_length_to_size = {8:dp(80), 9:dp(85), 10:dp(90), 11:dp(95), 12:dp(100), 13: dp(105), 14: dp(110), 15: dp(115), 16:dp(120), 17:dp(125), 18:dp(130), 19:dp(130)}
         for i, key in enumerate(word_length_to_size):
-            word_length_to_size[key] +=5
+            word_length_to_size[key] +=10
         # Randomly select indices for blanks
         blank_indices = random.sample(range(len(words)), self.blank_count)
 
         self.line_spacing = dp(60)
 
         # Create a grid layout for the sentence with blanks
-        sentence_layout = GridLayout(cols=3, size_hint=(0.9, None), row_default_height=self.line_spacing , pos_hint={'center_x': 0.6, 'center_y': 0.85})
-        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure it wraps correctly
+        # Create a GridLayout with 3 columns for wrapping
+        sentence_layout = GridLayout(
+            cols=3,  # Wrap after every 3 columns
+            size_hint=(0.9, None),
+            row_default_height=self.line_spacing,
+            pos_hint={'center_x': 0.5, 'center_y': 0.65}
+        )
+        sentence_layout.bind(minimum_height=sentence_layout.setter('height'))  # Ensure layout expands to fit content
 
         for i, word in enumerate(words):
             if i in blank_indices:
@@ -971,31 +977,30 @@ class FillInTheBlankScreen(Screen):
                 blank = TextInput(
                     multiline=False,
                     size_hint=(None, None),
-                    size=(word_length_to_size.get(longest_word_length, 70), dp(40)),  # Fixed size for blanks
-                    background_color=(1, 1, 1, 0.05),
-                    font_name = "cour.ttf",
+                    size=(dp(110), dp(40)),  # Fixed size for blanks
+                    background_color=(1, 1, 1, 0.1),
+                    font_name="cour.ttf",
                     cursor_width=3,
                     foreground_color=(1, 1, 1, 1),
                     halign="center",
-                    font_size=sp(18)
+                    font_size=sp(16)
                 )
-                blank.bind(on_text_validate=self.next_empty_entry)  # Bind Enter key event
+                blank.bind(on_text_validate=self.next_empty_entry)
                 sentence_layout.add_widget(blank)
-                self.user_inputs.append(blank)  # Store the TextInput widget in the list
-                self.correct_words.append(word)  # Store the correct word for this blank
+                self.user_inputs.append(blank)
+                self.correct_words.append(word)
             else:
-                self.wrap_width = 150  # Define the maximum width for wrapping text
                 # Add the word as a label
                 label = Label(
                     text=word,
                     size_hint=(None, None),
-                    size=(self.wrap_width, dp(40)),  # Dynamically size based on word length
+                    size=(dp(100), dp(40)),  # Fixed size for consistent alignment
                     halign="center",
-                    font_name = "cour.ttf",
                     valign="middle",
+                    font_name="cour.ttf",
                     font_size=sp(20)
                 )
-                label.bind(size=label.setter('text_size'))  # Ensure text fits inside label
+                label.bind(size=label.setter('text_size'))
                 sentence_layout.add_widget(label)
 
         self.layout.add_widget(sentence_layout)
