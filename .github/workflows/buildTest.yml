@@ -10,6 +10,11 @@ jobs:
       image: ubuntu:20.04
 
     steps:
+      - name: Clear GitHub Cache (to avoid issues)
+        run: |
+          rm -rf ~/.cache
+          rm -rf ~/actions
+
       - name: Install dependencies
         run: |
           apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
@@ -23,7 +28,7 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Checkout project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Update checkout version
 
       - name: Build APK
         run: |
@@ -35,7 +40,7 @@ jobs:
         run: mv bin/*.apk bin/test.apk
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: github.com/actions/upload-artifact@v2  # Full path to upload-artifact action
         with:
           name: test-apk
           path: bin/test.apk
