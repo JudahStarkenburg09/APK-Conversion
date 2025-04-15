@@ -35,7 +35,7 @@ jobs:
         run: mv bin/*.apk bin/test.apk
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: test-apk
           path: bin/test.apk
